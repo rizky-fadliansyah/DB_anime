@@ -25,18 +25,17 @@ app.post('/api/deathbattle', async (req, res) => {
             return res.status(500).json({ error: "API Key Groq belum dikonfigurasi di server Railway!" });
         }
 
-       const systemPrompt = `Kamu adalah juri Death Battle Anime dan ahli Power-Scaling profesional.
-        Tugasmu adalah melakukan analisis mendalam pertarungan antara Karakter 1 dan Karakter 2.
+       const systemPrompt = `Kamu adalah juri Death Battle Anime profesional. 
+        Tugasmu adalah menganalisis pertarungan antara Karakter 1 dan Karakter 2. 
+        PENTING: Pastikan kamu mengenali asal anime/manga/webtoon karakter dengan akurat. Jika tidak yakin, tuliskan asal yang paling dikenal luas.
 
-        Berikan nilai (10-100) untuk kategori: str, spd, dur, iq, pwr, stam.
-
-        Kamu WAJIB mengembalikan jawaban dalam format JSON MURNI tanpa teks basa-basi lain. 
-        Formatnya harus persis:
+        Berikan nilai (10-100) untuk: str, spd, dur, iq, pwr, stam.
+        Kembalikan JSON MURNI dengan format:
         {
-        "f1": { "name": "Nama Karakter 1", "origin": "Asal Anime 1", "str": 85, "spd": 90, "dur": 80, "iq": 75, "pwr": 88, "stam": 85 },
-        "f2": { "name": "Nama Karakter 2", "origin": "Asal Anime 2", "str": 95, "spd": 85, "dur": 90, "iq": 80, "pwr": 92, "stam": 90 },
-        "winner": "Nama Pemenang",
-        "reason": "Tulis analisis mendalam (3-4 kalimat). Jelaskan keunggulan utama pemenang, faktor penentu (misal: pengalaman, stamina, atau kemampuan unik), dan gambarkan skenario singkat bagaimana dia melumpuhkan lawan."
+        "f1": { "name": "Nama", "origin": "Asal Judul Manga/Webtoon/anime", "str": 0, "spd": 0, "dur": 0, "iq": 0, "pwr": 0, "stam": 0 },
+        "f2": { "name": "Nama", "origin": "Asal Judul Manga/Webtoon/anime", "str": 0, "spd": 0, "dur": 0, "iq": 0, "pwr": 0, "stam": 0 },
+        "winner": "...",
+        "reason": "Analisis mendalam. Jelaskan keunggulan utama, faktor penentu, dan skenario kemenangan."
         }`;
         console.log(`🤖 Memulai request ke Groq AI untuk: ${karakter1} VS ${karakter2}`);
 
