@@ -12,34 +12,33 @@ app.use(express.static(__dirname));
 const GROQ_API_KEY = process.env.GROQ_API_KEY;
 
 app.post('/api/deathbattle', async (req, res) => {
-    const { karakter1, karakter2 } = req.body;
+    // Supaya aman dari crash global, kita bungkus semua proses di dalam try-catch paling luar
+    try {
+        const { karakter1, karakter2 } = req.body;
 
-    if (!karakter1 || !karakter2) {
-        return res.status(400).json({ error: "Kedua nama karakter harus diisi!" });
-    }
+        if (!karakter1 || !karakter2) {
+            return res.status(400).json({ error: "Kedua nama karakter harus diisi, Ky!" });
+        }
 
-    if (!GROQ_API_KEY) {
-        return res.status(500).json({ error: "API Key Groq belum dikonfigurasi di server Railway!" });
-    }
+        if (!GROQ_API_KEY) {
+            console.error("❌ ERROR: GROQ_API_KEY tidak terbaca di Environment!");
+            return res.status(500).json({ error: "API Key Groq belum dikonfigurasi di server Railway!" });
+        }
 
-    const systemPrompt = `Kamu adalah juri Death Battle Anime dan ahli Power-Scaling profesional. 
+        const systemPrompt = `Kamu adalah juri Death Battle Anime dan ahli Power-Scaling profesional. 
 Tugasmu adalah menganalisis pertarungan antara Karakter 1 dan Karakter 2 berdasarkan data anime/manga terbaru.
-Berikan nilai angka mutlak dari 10 sampai 100 untuk kategori berikut:
-- str (Strength)
-- spd (Speed)
-- dur (Durability)
-- iq (Battle IQ)
-- pwr (Powers/Hax/Kemampuan Khusus)
-
+Berikan nilai angka mutlak dari 10 sampai 100 untuk kategori berikut: str, spd, dur, iq, pwr.
 Kamu WAJIB mengembalikan jawaban dalam format JSON MURNI tanpa teks basa-basi lain di luar JSON. Formatnya harus persis seperti ini:
 {
   "f1": { "name": "Nama Karakter 1", "str": 85, "spd": 90, "dur": 80, "iq": 75, "pwr": 88 },
   "f2": { "name": "Nama Karakter 2", "str": 95, "spd": 85, "dur": 90, "iq": 80, "pwr": 92 },
   "winner": "Nama Karakter Yang Menang",
-  "reason": "Penjelasan singkat 1-2 kalimat kenapa dia menang berdasarkan analisis kekuatan mereka."
+  "reason": "Penjelasan singkat 1-2 kalimat kenapa dia menang."
 }`;
 
-    try {
+        console.log(`🤖 Memulai request ke Groq AI untuk: ${karakter1} VS ${karakter2}`);
+
+        // Kirim request ke Groq menggunakan Axios dengan timeout keamanan 15 detik
         const response = await axios.post(
             "https://api.groq.com/openai/v1/chat/completions",
             {
@@ -53,27 +52,30 @@ Kamu WAJIB mengembalikan jawaban dalam format JSON MURNI tanpa teks basa-basi la
             },
             {
                 headers: {
-                    "Authorization": `Bearer ${GROQ_API_KEY}`,
+                    "Authorization": `Bearer ${GROQ_API_KEY.trim()}`, // Otomatis bersihkan spasi gaib jika ada
                     "Content-Type": "application/json"
-                }
+                },
+                timeout: 15000 // Jika 15 detik groq ga respon, batalkan biar server ga hang
             }
         );
 
-        // Axios otomatis melakukan parsing JSON data
         const aiContent = response.data.choices[0].message.content;
-        const aiResult = JSON.parse(aiContent);
+        console.log("✅ Respon Groq AI berhasil diterima.");
         
-        res.json(aiResult);
+        const aiResult = JSON.parse(aiContent);
+        return res.json(aiResult);
 
     } catch (error) {
-        console.error("Error backend:", error.response ? error.response.data : error.message);
+        // Blok ini menangkap semua error (baik error axios, typo kode, atau JSON parse gagal)
+        console.error("💥 TERJADI ERROR PADA BACKEND:", error.message);
         
-        // Kirim detail error asli dari Groq ke frontend biar gampang di-debug
-        const errorMsg = error.response && error.response.data && error.response.data.error 
-            ? error.response.data.error.message 
-            : "Gagal menganalisis lewat Groq AI";
-            
-        res.status(500).json({ error: errorMsg });
+        let pesanError = "Gagal menganalisis lewat Groq AI.";
+        if (error.response && error.response.data && error.response.data.error) {
+            pesanError = error.response.data.error.message;
+        }
+
+        // SERVER TIDAK BOLEH MATI! Kita kirim status 500 berupa JSON agar frontend tahu
+        return res.status(500).json({ error: pesanError });
     }
 });
 
