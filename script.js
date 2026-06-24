@@ -22,7 +22,7 @@ battleBtn.addEventListener("click", async () => {
     resetBars();
 
     try {
-        const response = await fetch('/api/deathbattle', {
+       const response = await fetch('https://db-anime-production.up.railway.app/api/deathbattle', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ karakter1: char1, karakter2: char2 })
