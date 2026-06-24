@@ -1,14 +1,12 @@
 const express = require('express');
 const cors = require('cors');
+const axios = require('axios'); // Menggunakan axios yang lebih stabil di server cloud
 require('dotenv').config();
 
 const app = express();
 
-// Mengizinkan frontend dari mana saja untuk mengakses API ini
 app.use(cors());
 app.use(express.json());
-
-// Sajikan file statis (HTML, CSS, JS) jika ditaruh di folder yang sama
 app.use(express.static(__dirname));
 
 const GROQ_API_KEY = process.env.GROQ_API_KEY;
@@ -42,13 +40,9 @@ Kamu WAJIB mengembalikan jawaban dalam format JSON MURNI tanpa teks basa-basi la
 }`;
 
     try {
-        const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-            method: "POST",
-            headers: {
-                "Authorization": `Bearer ${GROQ_API_KEY}`,
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
+        const response = await axios.post(
+            "https://api.groq.com/openai/v1/chat/completions",
+            {
                 model: "llama-3.3-70b-versatile",
                 messages: [
                     { role: "system", content: systemPrompt },
@@ -56,24 +50,32 @@ Kamu WAJIB mengembalikan jawaban dalam format JSON MURNI tanpa teks basa-basi la
                 ],
                 response_format: { type: "json_object" },
                 temperature: 0.5
-            })
-        });
+            },
+            {
+                headers: {
+                    "Authorization": `Bearer ${GROQ_API_KEY}`,
+                    "Content-Type": "application/json"
+                }
+            }
+        );
 
-        if (!response.ok) {
-            throw new Error(`Groq API bermasalah: ${response.status}`);
-        }
-
-        const rawData = await response.json();
-        const aiResult = JSON.parse(rawData.choices[0].message.content);
+        // Axios otomatis melakukan parsing JSON data
+        const aiContent = response.data.choices[0].message.content;
+        const aiResult = JSON.parse(aiContent);
         
         res.json(aiResult);
 
     } catch (error) {
-        console.error("Error backend:", error);
-        res.status(500).json({ error: "Gagal menganalisis lewat Groq AI" });
+        console.error("Error backend:", error.response ? error.response.data : error.message);
+        
+        // Kirim detail error asli dari Groq ke frontend biar gampang di-debug
+        const errorMsg = error.response && error.response.data && error.response.data.error 
+            ? error.response.data.error.message 
+            : "Gagal menganalisis lewat Groq AI";
+            
+        res.status(500).json({ error: errorMsg });
     }
 });
 
-// Menggunakan PORT dinamis dari Railway
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`🔥 Server Arena aktif di port ${PORT}`));

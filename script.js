@@ -19,28 +19,34 @@ battleBtn.addEventListener("click", async () => {
     arenaDisplay.style.display = "none";
     battleBtn.disabled = true;
 
-    // Reset bar menjadi 0% sebelum animasi pengisian baru dimulai
     resetBars();
 
     try {
-        // Menggunakan relative path agar fleksibel saat dideploy ke server manapun
         const response = await fetch('/api/deathbattle', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ karakter1: char1, karakter2: char2 })
         });
         
+        const textData = await response.text();
+        
         if (!response.ok) {
-            const errData = await response.json();
-            throw new Error(errData.error || "Gagal mengambil data dari server");
+            let serverErrorMessage = "Terjadi kesalahan pada server.";
+            try {
+                const jsonErr = JSON.parse(textData);
+                serverErrorMessage = jsonErr.error || serverErrorMessage;
+            } catch(e) {
+                serverErrorMessage = `Error ${response.status}: Server crash atau overload.`;
+            }
+            throw new Error(serverErrorMessage);
         }
         
-        const data = await response.json();
+        const data = JSON.parse(textData);
         renderBattleResult(data);
 
     } catch (error) {
         console.error("Gagal mengambil data Groq:", error);
-        alert(`Waduh! ${error.message}. Pastikan server aktif dan API Key terpasang.`);
+        alert(`Waduh! ${error.message}`);
     } finally {
         loadingArea.style.display = "none";
         battleBtn.disabled = false;
@@ -60,7 +66,6 @@ function renderBattleResult(data) {
 
     arenaDisplay.style.display = "flex";
 
-    // Trigger animasi pengisian grafik bar secara perlahan
     setTimeout(() => {
         document.getElementById("bar-str-f1").style.width = `${data.f1.str}%`;
         document.getElementById("bar-spd-f1").style.width = `${data.f1.spd}%`;
