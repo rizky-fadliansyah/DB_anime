@@ -49,7 +49,7 @@ Kamu WAJIB mengembalikan jawaban dalam format JSON MURNI tanpa teks basa-basi la
                 "Content-Type": "application/json"
             },
             body: JSON.stringify({
-                model: "llama3-8b-8192",
+                model: "llama-3.3-70b-versatile",
                 messages: [
                     { role: "system", content: systemPrompt },
                     { role: "user", content: `Lakukan analisis death battle: ${karakter1} VS ${karakter2}` }
