@@ -61,16 +61,22 @@ function resetBars() {
 function renderBattleResult(data) {
     nameF1.innerText = data.f1.name;
     nameF2.innerText = data.f2.name;
-    battleWinner.innerText = `Pemenang: ${data.winner}`;
-    battleReason.innerText = data.reason; // Analisis panjang AI bakal masuk ke sini
+    battleWinner.innerText = data.winner;
+    battleReason.innerText = data.reason;
 
     arenaDisplay.style.display = "flex";
 
-    // Update Bar (termasuk Stamina)
+    // Daftar stat yang akan diupdate
     const stats = ["str", "spd", "dur", "iq", "pwr", "stam"];
+    
     stats.forEach(stat => {
-        document.getElementById(`bar-${stat}-f1`).style.width = `${data.f1[stat]}%`;
-        document.getElementById(`bar-${stat}-f2`).style.width = `${data.f2[stat]}%`;
+        // Update f1
+        const el1 = document.getElementById(`bar-${stat}-f1`);
+        if (el1) el1.style.width = `${data.f1[stat]}%`;
+        
+        // Update f2
+        const el2 = document.getElementById(`bar-${stat}-f2`);
+        if (el2) el2.style.width = `${data.f2[stat]}%`;
     });
 
     if (typeof confetti === "function") {
