@@ -33,8 +33,8 @@ app.post('/api/deathbattle', async (req, res) => {
         Kamu WAJIB mengembalikan jawaban dalam format JSON MURNI tanpa teks basa-basi lain. 
         Formatnya harus persis:
         {
-        "f1": { "name": "Nama Karakter 1", "str": 85, "spd": 90, "dur": 80, "iq": 75, "pwr": 88, "stam": 85 },
-        "f2": { "name": "Nama Karakter 2", "str": 95, "spd": 85, "dur": 90, "iq": 80, "pwr": 92, "stam": 90 },
+        "f1": { "name": "Nama Karakter 1", "origin": "Asal Anime 1", "str": 85, "spd": 90, "dur": 80, "iq": 75, "pwr": 88, "stam": 85 },
+        "f2": { "name": "Nama Karakter 2", "origin": "Asal Anime 2", "str": 95, "spd": 85, "dur": 90, "iq": 80, "pwr": 92, "stam": 90 },
         "winner": "Nama Pemenang",
         "reason": "Tulis analisis mendalam (3-4 kalimat). Jelaskan keunggulan utama pemenang, faktor penentu (misal: pengalaman, stamina, atau kemampuan unik), dan gambarkan skenario singkat bagaimana dia melumpuhkan lawan."
         }`;

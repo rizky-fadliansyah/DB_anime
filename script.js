@@ -5,7 +5,9 @@ const loadingArea = document.getElementById("loading");
 const arenaDisplay = document.getElementById("arena-display");
 
 const nameF1 = document.getElementById("name-f1");
+const asalF1 = document.getElementById("origin-f1");
 const nameF2 = document.getElementById("name-f2");
+const asalF2 = document.getElementById("origin-f2");
 const battleWinner = document.getElementById("battle-winner");
 const battleReason = document.getElementById("battle-reason");
 
@@ -60,7 +62,9 @@ function resetBars() {
 
 function renderBattleResult(data) {
     nameF1.innerText = data.f1.name;
+    asalF1.innerText = data.f1.origin;
     nameF2.innerText = data.f2.name;
+    asalF2.innerText = data.f2.origin;
     battleWinner.innerText = data.winner;
     battleReason.innerText = data.reason;
 
