@@ -61,24 +61,17 @@ function resetBars() {
 function renderBattleResult(data) {
     nameF1.innerText = data.f1.name;
     nameF2.innerText = data.f2.name;
-    battleWinner.innerText = data.winner;
-    battleReason.innerText = data.reason;
+    battleWinner.innerText = `Pemenang: ${data.winner}`;
+    battleReason.innerText = data.reason; // Analisis panjang AI bakal masuk ke sini
 
     arenaDisplay.style.display = "flex";
 
-    setTimeout(() => {
-        document.getElementById("bar-str-f1").style.width = `${data.f1.str}%`;
-        document.getElementById("bar-spd-f1").style.width = `${data.f1.spd}%`;
-        document.getElementById("bar-dur-f1").style.width = `${data.f1.dur}%`;
-        document.getElementById("bar-iq-f1").style.width = `${data.f1.iq}%`;
-        document.getElementById("bar-pwr-f1").style.width = `${data.f1.pwr}%`;
-
-        document.getElementById("bar-str-f2").style.width = `${data.f2.str}%`;
-        document.getElementById("bar-spd-f2").style.width = `${data.f2.spd}%`;
-        document.getElementById("bar-dur-f2").style.width = `${data.f2.dur}%`;
-        document.getElementById("bar-iq-f2").style.width = `${data.f2.iq}%`;
-        document.getElementById("bar-pwr-f2").style.width = `${data.f2.pwr}%`;
-    }, 100);
+    // Update Bar (termasuk Stamina)
+    const stats = ["str", "spd", "dur", "iq", "pwr", "stam"];
+    stats.forEach(stat => {
+        document.getElementById(`bar-${stat}-f1`).style.width = `${data.f1[stat]}%`;
+        document.getElementById(`bar-${stat}-f2`).style.width = `${data.f2[stat]}%`;
+    });
 
     if (typeof confetti === "function") {
         confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 } });

@@ -182,4 +182,13 @@ h1 {
     animation: spin 1s linear infinite;
     margin: 0 auto 15px;
 }
+#battle-reason {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    margin-top: 15px;
+    padding: 15px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    color: #eee;
+}
 @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
