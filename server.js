@@ -32,8 +32,8 @@ app.post('/api/deathbattle', async (req, res) => {
         Berikan nilai (10-100) untuk: str, spd, dur, iq, pwr, stam.
         Kembalikan JSON MURNI dengan format:
         {
-        "f1": { "name": "Nama", "origin": "Asal Judul Manga/Webtoon/anime", "str": 0, "spd": 0, "dur": 0, "iq": 0, "pwr": 0, "stam": 0 },
-        "f2": { "name": "Nama", "origin": "Asal Judul Manga/Webtoon/anime", "str": 0, "spd": 0, "dur": 0, "iq": 0, "pwr": 0, "stam": 0 },
+        "f1": { "name": "Nama", "str": 0, "spd": 0, "dur": 0, "iq": 0, "pwr": 0, "stam": 0 },
+        "f2": { "name": "Nama", "str": 0, "spd": 0, "dur": 0, "iq": 0, "pwr": 0, "stam": 0 },
         "winner": "...",
         "reason": "Analisis mendalam. Jelaskan keunggulan utama, faktor penentu, dan skenario kemenangan."
         }`;
