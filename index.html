@@ -13,16 +13,20 @@
         <p class="subtitle">Masukkan nama karakter anime / webtoon / manga</p>
 
         <div class="battle-input-group">
-            <input type="text" id="fighter1-input" placeholder="Karakter 1 (Misal: Gun Park)">
+    
+        <div class="input-row">
+            <input type="text" id="fighter1-input" placeholder="Nama Karakter 1 (Misal: Gun Park)">
             <span class="vs-text">VS</span>
-            <input type="text" id="fighter2-input" placeholder="Karakter 2 (Misal: Goku UI)">
-            
-            <div class="btn-group" style="display: flex; gap: 10px; margin-top: 15px; justify-content: center;">
-                <button id="check-btn-f1" style="background-color: #007bff;">CEK DATA CHAR 1 🔍</button>
-                <button id="battle-btn">MULAI DUEL! 🏟️</button>
-                <button id="check-btn-f2" style="background-color: #2841a7;">CEK DATA CHAR 2 🔍</button>
-            </div>
+            <input type="text" id="fighter2-input" placeholder="Nama Karakter 2 (Misal: Goku UI)">
         </div>
+        
+        <div class="btn-group">
+            <button id="check-f1-btn">CEK DATA CHAR 1 🔍</button>
+            <button id="battle-btn">MULAI DUEL! 🏟️</button>
+            <button id="check-f2-btn">CEK DATA CHAR 2 🔍</button>
+        </div>
+        
+    </div>
 
         <div id="loading" class="loading-status" style="display: none;">
             <div class="spinner"></div>
