@@ -14,12 +14,17 @@ const GROQ_API_KEY = process.env.GROQ_API_KEY;
 app.post('/api/deathbattle', async (req, res) => {
     try {
         const { karakter1, karakter2 } = req.body;
-        const systemPrompt = `Kamu adalah juri Death Battle Anime profesional. Analisis pertarungan dengan akurat.
-Tambahkan "tier" kekuatan karakter secara keseluruhan (misal: Street, Building, Island, Planet, Multiverse, dll), "desc" (deskripsi singkat 1 kalimat), dan "ability" (kemampuan utama karakter).
+        const systemPrompt = `Kamu adalah juri Death Battle Anime profesional, objektif, dan sangat detail. 
+Analisis pertarungan ini secara mendalam dengan membandingkan aspek kecepatan (Speed scaling), daya hancur (Attack Potency), ketahanan (Durability), serta kemampuan khusus/hax dari kedua karakter.
+
+Berikan penjelasan kesimpulan (reason) yang panjang, berbobot, dan logis (minimal 3-5 kalimat) mengapa karakter tersebut bisa menang atau mengapa pertarungan berjalan sepihak.
+
+Tambahkan "tier" kekuatan karakter secara keseluruhan (misal: Street, Building, Mountain, Island, Planet, Multiverse, dll), "desc" (deskripsi singkat 1 kalimat), dan "ability" (kemampuan utama karakter).
+
 Kembalikan JSON MURNI dengan format berikut:
 {
-  "f1": { "name": "...", "origin": "...", "tier": "...", "desc": "...", "ability": "...", "str": 85, "spd": 90, "dur": 80, "iq": 75, "pwr": 88, "stam": 85 },
-  "f2": { "name": "...", "origin": "...", "tier": "...", "desc": "...", "ability": "...", "str": 95, "spd": 85, "dur": 90, "iq": 80, "pwr": 92, "stam": 90 },
+  "f1": { "name": "...", "origin": "...", "tier": "...", "desc": "...", "ability": "...", "str": 50, "spd": 50, "dur": 50, "iq": 50, "pwr": 50, "stam": 50 },
+  "f2": { "name": "...", "origin": "...", "tier": "...", "desc": "...", "ability": "...", "str": 50, "spd": 50, "dur": 50, "iq": 50, "pwr": 50, "stam": 50 },
   "winner": "...",
   "reason": "..."
 }`;
