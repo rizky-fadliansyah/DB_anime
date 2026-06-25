@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Anime Scaling Power & Battle Arena</title>
+    <title>Anime Scaling Power & Battle Arena (Groq AI)</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -12,51 +12,67 @@
         <h1>⚔️ Anime Scaling Power Arena</h1>
         <p class="subtitle">Masukkan nama karakter anime / webtoon / manga</p>
 
+        <!-- INPUT FIGHTER CONTAINER -->
         <div class="battle-input-group">
-    
-        <div class="input-row">
-            <input type="text" id="fighter1-input" placeholder="Nama Karakter 1 (Misal: Gun Park)">
-            <span class="vs-text">VS</span>
-            <input type="text" id="fighter2-input" placeholder="Nama Karakter 2 (Misal: Goku UI)">
+            <div class="input-row">
+                <input type="text" id="fighter1-input" placeholder="Karakter 1 (Misal: Gun Park)">
+                <span class="vs-text">VS</span>
+                <input type="text" id="fighter2-input" placeholder="Karakter 2 (Misal: Goku UI)">
+            </div>
+            
+            <div class="btn-group">
+                <button id="check-f1-btn">CEK DATA CHAR 1 🔍</button>
+                <button id="battle-btn">MULAI DUEL! 🏟️</button>
+                <button id="check-f2-btn">CEK DATA CHAR 2 🔍</button>
+            </div>
         </div>
-        
-        <div class="btn-group">
-            <button id="check-f1-btn">CEK DATA CHAR 1 🔍</button>
-            <button id="battle-btn">MULAI DUEL! 🏟️</button>
-            <button id="check-f2-btn">CEK DATA CHAR 2 🔍</button>
-        </div>
-        
-    </div>
 
+        <!-- LOADING STATE -->
         <div id="loading" class="loading-status" style="display: none;">
             <div class="spinner"></div>
-            <p>Groq AI sedang memproses data...</p>
+            <p>Groq AI sedang menganalisis tingkat kekuatan dan meracik database...</p>
         </div>
 
-        <div id="preview-display" class="fighter-card" style="display: none; margin: 30px auto; max-width: 400px; float: none;">
-            <h2 id="prev-name">Nama Karakter</h2>
-            <p id="prev-origin" style="font-style: italic; color: #aaa; margin-bottom: 15px;"></p>
-            <div class="stat-bar-container"><div class="stat-fill" id="bar-str-prev"></div><span>Strength</span></div>
-            <div class="stat-bar-container"><div class="stat-fill" id="bar-spd-prev"></div><span>Speed</span></div>
-            <div class="stat-bar-container"><div class="stat-fill" id="bar-dur-prev"></div><span>Durability</span></div>
-            <div class="stat-bar-container"><div class="stat-fill" id="bar-iq-prev"></div><span>Battle IQ</span></div>
-            <div class="stat-bar-container"><div class="stat-fill" id="bar-pwr-prev"></div><span>Powers/Hax</span></div>
-            <div class="stat-bar-container"><div class="stat-fill" id="bar-stam-prev"></div><span>Stamina</span></div>
+        <!-- ================= PREVIEW CEK DATA SINGLE ================= -->
+        <div id="preview-display" class="fighter-card display-center-card" style="display: none;">
+            <div class="card-header-flex">
+                <h2 id="prev-name">Nama Karakter</h2>
+                <span id="prev-tier" class="tier-badge">Tier</span>
+            </div>
+            <p id="prev-origin" class="char-origin"></p>
+            <p class="char-info-text"><strong>Bio:</strong> <span id="prev-desc">-</span></p>
+            <p class="char-info-text" style="margin-bottom: 15px;"><strong>Skill:</strong> <span id="prev-ability">-</span></p>
+            
+            <div class="stat-bar-container"><div class="stat-fill" id="bar-str-prev"></div><span class="stat-label">Strength</span><span id="val-str-prev" class="stat-num">-</span></div>
+            <div class="stat-bar-container"><div class="stat-fill" id="bar-spd-prev"></div><span class="stat-label">Speed</span><span id="val-spd-prev" class="stat-num">-</span></div>
+            <div class="stat-bar-container"><div class="stat-fill" id="bar-dur-prev"></div><span class="stat-label">Durability</span><span id="val-dur-prev" class="stat-num">-</span></div>
+            <div class="stat-bar-container"><div class="stat-fill" id="bar-iq-prev"></div><span class="stat-label">Battle IQ</span><span id="val-iq-prev" class="stat-num">-</span></div>
+            <div class="stat-bar-container"><div class="stat-fill" id="bar-pwr-prev"></div><span class="stat-label">Powers/Hax</span><span id="val-pwr-prev" class="stat-num">-</span></div>
+            <div class="stat-bar-container"><div class="stat-fill" id="bar-stam-prev"></div><span class="stat-label">Stamina</span><span id="val-stam-prev" class="stat-num">-</span></div>
         </div>
 
+        <!-- ================= ARENA BATTLE DUEL ================= -->
         <div id="arena-display" class="arena-layout" style="display: none;">
             
-            <div class="fighter-card card-left">
-                <h2 id="name-f1">Karakter 1</h2>
-                <p id="origin-f1" style="font-style: italic; color: #aaa; margin-bottom: 15px;"></p>
-                <div class="stat-bar-container"><div class="stat-fill" id="bar-str-f1"></div><span>Strength</span></div>
-                <div class="stat-bar-container"><div class="stat-fill" id="bar-spd-f1"></div><span>Speed</span></div>
-                <div class="stat-bar-container"><div class="stat-fill" id="bar-dur-f1"></div><span>Durability</span></div>
-                <div class="stat-bar-container"><div class="stat-fill" id="bar-iq-f1"></div><span>Battle IQ</span></div>
-                <div class="stat-bar-container"><div class="stat-fill" id="bar-pwr-f1"></div><span>Powers/Hax</span></div>
-                <div class="stat-bar-container"><div class="stat-fill" id="bar-stam-f1"></div><span>Stamina</span></div>
+            <!-- Petarung 1 -->
+            <div class="fighter-card">
+                <div class="card-header-flex">
+                    <h2 id="name-f1">Karakter 1</h2>
+                    <span id="tier-f1" class="tier-badge">Tier</span>
+                </div>
+                <p id="origin-f1" class="char-origin"></p>
+                <p class="char-info-text"><strong>Bio:</strong> <span id="desc-f1">-</span></p>
+                <p class="char-info-text" style="margin-bottom: 15px;"><strong>Skill:</strong> <span id="ability-f1">-</span></p>
+                
+                <div class="stat-bar-container"><div class="stat-fill" id="bar-str-f1"></div><span class="stat-label">Strength</span><span id="val-str-f1" class="stat-num">-</span></div>
+                <div class="stat-bar-container"><div class="stat-fill" id="bar-spd-f1"></div><span class="stat-label">Speed</span><span id="val-spd-f1" class="stat-num">-</span></div>
+                <div class="stat-bar-container"><div class="stat-fill" id="bar-dur-f1"></div><span class="stat-label">Durability</span><span id="val-dur-f1" class="stat-num">-</span></div>
+                <div class="stat-bar-container"><div class="stat-fill" id="bar-iq-f1"></div><span class="stat-label">Battle IQ</span><span id="val-iq-f1" class="stat-num">-</span></div>
+                <div class="stat-bar-container"><div class="stat-fill" id="bar-pwr-f1"></div><span class="stat-label">Powers/Hax</span><span id="val-pwr-f1" class="stat-num">-</span></div>
+                <div class="stat-bar-container"><div class="stat-fill" id="bar-stam-f1"></div><span class="stat-label">Stamina</span><span id="val-stam-f1" class="stat-num">-</span></div>
             </div>
 
+            <!-- VS CENTER DISPLAY (Hasil Analisis & Juara) -->
             <div class="arena-center">
                 <div class="winner-announcement">
                     <h3>🏆 PEMENANG:</h3>
@@ -67,21 +83,29 @@
                 </div>
             </div>
 
-            <div class="fighter-card card-right">
-                <h2 id="name-f2">Karakter 2</h2>
-                <p id="origin-f2" style="font-style: italic; color: #aaa; margin-bottom: 15px;"></p>
-                <div class="stat-bar-container"><div class="stat-fill" id="bar-str-f2"></div><span>Strength</span></div>
-                <div class="stat-bar-container"><div class="stat-fill" id="bar-spd-f2"></div><span>Speed</span></div>
-                <div class="stat-bar-container"><div class="stat-fill" id="bar-dur-f2"></div><span>Durability</span></div>
-                <div class="stat-bar-container"><div class="stat-fill" id="bar-iq-f2"></div><span>Battle IQ</span></div>
-                <div class="stat-bar-container"><div class="stat-fill" id="bar-pwr-f2"></div><span>Powers/Hax</span></div>
-                <div class="stat-bar-container"><div class="stat-fill" id="bar-stam-f2"></div><span>Stamina</span></div>
+            <!-- Petarung 2 -->
+            <div class="fighter-card">
+                <div class="card-header-flex">
+                    <h2 id="name-f2">Karakter 2</h2>
+                    <span id="tier-f2" class="tier-badge">Tier</span>
+                </div>
+                <p id="origin-f2" class="char-origin"></p>
+                <p class="char-info-text"><strong>Bio:</strong> <span id="desc-f2">-</span></p>
+                <p class="char-info-text" style="margin-bottom: 15px;"><strong>Skill:</strong> <span id="ability-f2">-</span></p>
+                
+                <div class="stat-bar-container"><div class="stat-fill" id="bar-str-f2"></div><span class="stat-label">Strength</span><span id="val-str-f2" class="stat-num">-</span></div>
+                <div class="stat-bar-container"><div class="stat-fill" id="bar-spd-f2"></div><span class="stat-label">Speed</span><span id="val-spd-f2" class="stat-num">-</span></div>
+                <div class="stat-bar-container"><div class="stat-fill" id="bar-dur-f2"></div><span class="stat-label">Durability</span><span id="val-dur-f2" class="stat-num">-</span></div>
+                <div class="stat-bar-container"><div class="stat-fill" id="bar-iq-f2"></div><span class="stat-label">Battle IQ</span><span id="val-iq-f2" class="stat-num">-</span></div>
+                <div class="stat-bar-container"><div class="stat-fill" id="bar-pwr-f2"></div><span class="stat-label">Powers/Hax</span><span id="val-pwr-f2" class="stat-num">-</span></div>
+                <div class="stat-bar-container"><div class="stat-fill" id="bar-stam-f2"></div><span class="stat-label">Stamina</span><span id="val-stam-f2" class="stat-num">-</span></div>
             </div>
 
         </div>
     </div>
 
+    <!-- KONFETTI EFEK SAAT MENANG -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <script src="script.js"></script>
 </body>
-</html>
+</html> 
