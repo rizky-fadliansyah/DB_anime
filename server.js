@@ -44,7 +44,7 @@ Kembalikan JSON MURNI dengan format berikut:
 });
 
 // PROMPT UTAMA UNTUK CEK DATA SINGLE
-// PROMPT UTAMA UNTUK ARENA DUEL (ANTI-KONSISTENSI EROR & FORMAT KETAT)
+// PROMPT UTAMA UNTUK ARENA DUEL (WAJIB FORM TERKUAT & POTENSI PENUH)
 app.post('/api/deathbattle', async (req, res) => {
     try {
         const { karakter1, karakter2 } = req.body;
@@ -53,13 +53,9 @@ app.post('/api/deathbattle', async (req, res) => {
 
 Tugasmu:
 1. Analisis pertarungan antara Karakter 1 dan Karakter 2 berdasarkan spesifikasi nama dan asal anime/manga/webtoon yang diberikan oleh user. Jangan mengambil data dari versi fan-fiction atau cross-over.
-2. Ambil data tingkat kekuatan (Attack Potency), Kecepatan (Speed), dan Kemampuan (Hax) kedua karakter murni berdasarkan artikel resmi mereka di VS BATTLES WIKI.
-3. PENTING & WAJIB KONSISTEN: Tulis isi bidang "tier" secara lengkap, detail, dan sangat spesifik mengikuti gaya VS Battles Wiki. Contoh pengisian tier yang akurat: 
-   - "Setidaknya High 8-C, lebih tinggi dengan senjata, jauh lebih tinggi dengan Moonlight Style"
-   - "Tier 2-A: Multiverse level"
-   - "Setidaknya 7-A, lebih tinggi dengan mode tertentu"
-   Jangan pernah memotong atau menyederhanakan tingkatan tier aslinya saat berada di arena duel ini.
-4. Berikan "reason" (analisis kemenangan) minimal 3-5 kalimat yang logis dan objektif berdasarkan perbandingan stat serta hax yang sah dari VS Battles Wiki. Jika salah satu karakter memiliki tier yang jauh lebih tinggi (misal: Multiverse vs City Level), jelaskan bahwa karakter tier tinggi menang mutlak karena perbedaan dimensi kekuatan yang masif.
+2. PENTING & WAJIB: Ambil data versi TERKUAT, bentuk puncak (Peak Form), senjata terbaik, dan potensi penuh (Full Power) dari kedua karakter murni berdasarkan artikel resmi mereka di VS BATTLES WIKI (Contoh: jika karakter memiliki beberapa kunci/keys status, pilih key status yang paling kanan/paling kuat, seperti Goo Kim dengan pedang/Moonlight Style, Goku dalam mode terkuatnya, dll).
+3. KONSISTENSI TIER: Tulis isi bidang "tier" secara lengkap dan sangat spesifik mengikuti kondisi puncak tersebut (Contoh: "Setidaknya High 8-C , lebih tinggi dengan senjata, jauh lebih tinggi dengan Moonlight Style"). Jangan pernah menurunkan atau mereduksi tier puncak mereka saat simulasi duel.
+4. Berikan "reason" (analisis kemenangan) minimal 3-5 kalimat yang logis dan objektif berdasarkan perbandingan stat serta hax puncak dari VS Battles Wiki. Jika salah satu karakter memiliki tier puncak yang jauh lebih tinggi, jelaskan bahwa karakter tier tinggi menang mutlak karena perbedaan dimensi kekuatan yang masif.
 
 Kembalikan JSON MURNI dengan format berikut:
 {
@@ -71,7 +67,7 @@ Kembalikan JSON MURNI dengan format berikut:
 
         const response = await axios.post("https://api.groq.com/openai/v1/chat/completions", {
             model: "llama-3.3-70b-versatile",
-            messages: [{ role: "system", content: systemPrompt }, { role: "user", content: `Duel antara Petarung 1: ${karakter1} VS Petarung 2: ${karakter2}.` }],
+            messages: [{ role: "system", content: systemPrompt }, { role: "user", content: `Duel hidup mati (POTENSI PENUH & FORM TERKUAT): Petarung 1: ${karakter1} VS Petarung 2: ${karakter2}.` }],
             response_format: { type: "json_object" }
         }, { headers: { "Authorization": `Bearer ${GROQ_API_KEY}` } });
 
@@ -81,7 +77,7 @@ Kembalikan JSON MURNI dengan format berikut:
     }
 });
 
-// PROMPT UTAMA UNTUK CEK DATA SINGLE (FORMAT KETAT VS BATTLES WIKI)
+// PROMPT UTAMA UNTUK CEK DATA SINGLE (WAJIB FORM TERKUAT)
 app.post('/api/checkcharacter', async (req, res) => {
     try {
         const { karakter } = req.body;
@@ -90,9 +86,10 @@ app.post('/api/checkcharacter', async (req, res) => {
 
 Tugasmu:
 1. Cari profil karakter ini di VS Battles Wiki berdasarkan informasi nama dan asal anime/manga/webtoon yang diinput oleh user.
-2. Isi bagian "tier" persis, lengkap, dan detail sesuai klasifikasi asli di VS Battles Wiki tanpa memotongnya (Contoh: "Setidaknya High 8-C, lebih tinggi dengan senjata, jauh lebih tinggi dengan Moonlight Style", "Tier Low 2-C", dll). Jangan pernah asal menebak.
-3. Pada bagian "desc" dan "ability", ekstrak informasi biodata singkat (seperti klasifikasi/usia jika ada) dan daftar kekuatan unik mereka secara padat seperti format Wiki (Contoh: Karakteristik Fisik Luar Biasa, Penguasaan Senjata, Toleransi Nyeri Tinggi, Induksi Rasa Takut, dll).
-4. Untuk nilai statistik "str", "spd", "dur", "iq", "pwr", "stam", konversikan tingkatan dasar/tier mereka di wiki menjadi angka 10-100 secara akurat berdasarkan skala tiering dunia nyata (Contoh: Karakter manusia biasa bernilai 10-25, tingkat High 8-C bernilai 45-55, sedangkan tingkat planet/multiverse bernilai 85-100).
+2. WAJIB: Ambil data bentuk TERKUAT, kondisi puncak (Peak Form), dan potensi penuh karakter tersebut dari wiki (Abaikan versi awal/versi lemah mereka).
+3. Isi bagian "tier" persis, lengkap, dan detail sesuai klasifikasi tertinggi di VS Battles Wiki (Contoh: "Setidaknya High 8-C , lebih tinggi dengan senjata, jauh lebih tinggi dengan Moonlight Style").
+4. Pada bagian "desc" dan "ability", ekstrak informasi biodata puncak dan semua daftar kekuatan unik (Hax) mereka secara padat seperti format Wiki.
+5. Untuk nilai statistik "str", "spd", "dur", "iq", "pwr", "stam", konversikan tingkatan kekuatan puncak mereka di wiki menjadi angka 10-100 secara akurat berdasarkan skala tiering dunia nyata.
 
 Kembalikan JSON MURNI dengan format berikut:
 {
@@ -101,7 +98,7 @@ Kembalikan JSON MURNI dengan format berikut:
 
         const response = await axios.post("https://api.groq.com/openai/v1/chat/completions", {
             model: "llama-3.3-70b-versatile",
-            messages: [{ role: "system", content: checkPrompt }, { role: "user", content: `Cari data karakter berikut beserta asal animenya: ${karakter}` }],
+            messages: [{ role: "system", content: checkPrompt }, { role: "user", content: `Cari data versi TERKUAT dan POTENSI PENUH dari karakter berikut beserta asal animenya: ${karakter}` }],
             response_format: { type: "json_object" }
         }, { headers: { "Authorization": `Bearer ${GROQ_API_KEY}` } });
 
