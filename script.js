@@ -1,8 +1,12 @@
 const battleBtn = document.getElementById("battle-btn");
 const checkF1Btn = document.getElementById("check-f1-btn");
 const checkF2Btn = document.getElementById("check-f2-btn");
-const f1Input = document.getElementById("fighter1-input");
-const f2Input = document.getElementById("fighter2-input");
+
+const p1Nama = document.getElementById("p1-nama");
+const p1Asal = document.getElementById("p1-asal");
+const p2Nama = document.getElementById("p2-nama");
+const p2Asal = document.getElementById("p2-asal");
+
 const loadingArea = document.getElementById("loading");
 const arenaDisplay = document.getElementById("arena-display");
 const previewDisplay = document.getElementById("preview-display");
@@ -35,30 +39,37 @@ function getGeneralPowerTier(value) {
     return "Street Lvl";
 }
 
-// Reset Seluruh Progress Bar & Teks Stat
 function resetBars() {
     document.querySelectorAll(".stat-fill").forEach(bar => bar.style.width = "0%");
     document.querySelectorAll(".stat-num").forEach(num => num.innerText = "-");
 }
 
+function toggleButtons(status) {
+    battleBtn.disabled = status;
+    checkF1Btn.disabled = status;
+    checkF2Btn.disabled = status;
+}
+
 // --- 1. PROSES MULAI BATTLE ARENA ---
 battleBtn.addEventListener("click", async () => {
-    const char1 = f1Input.value.trim();
-    const char2 = f2Input.value.trim();
+    const name1 = p1Nama.value.trim();
+    const origin1 = p1Asal.value.trim();
+    const name2 = p2Nama.value.trim();
+    const origin2 = p2Asal.value.trim();
 
-    if (!char1 || !char2) return alert("Masukkan kedua nama karakter anime dulu, Ky!");
+    if (!name1 || !origin1 || !name2 || !origin2) {
+        return alert("Kolom Nama dan Asal Anime untuk kedua petarung wajib diisi, Ky!");
+    }
 
     loadingArea.style.display = "block";
     arenaDisplay.style.display = "none";
     previewDisplay.style.display = "none"; 
-    
-    battleBtn.disabled = true;
-    checkF1Btn.disabled = true;
-    checkF2Btn.disabled = true;
+    toggleButtons(true);
     resetBars();
 
-    const finalChar1 = char1.toLowerCase().includes("dari") ? char1 : `${char1} (Karakter Anime/Manga/Webtoon)`;
-    const finalChar2 = char2.toLowerCase().includes("dari") ? char2 : `${char2} (Karakter Anime/Manga/Webtoon)`;
+    // Otomatis digabung rapi untuk dikirim ke API Groq
+    const finalChar1 = `${name1} dari seri ${origin1}`;
+    const finalChar2 = `${name2} dari seri ${origin2}`;
 
     try {
         const response = await fetch('/api/deathbattle', {
@@ -69,25 +80,21 @@ battleBtn.addEventListener("click", async () => {
         
         const data = await response.json();
         
-        // Memasukkan Teks Informasi Karakter 1
         document.getElementById("name-f1").innerText = data.f1.name;
         document.getElementById("origin-f1").innerText = `Asal: ${data.f1.origin}`;
         document.getElementById("tier-f1").innerText = data.f1.tier;
         document.getElementById("desc-f1").innerText = data.f1.desc;
         document.getElementById("ability-f1").innerText = data.f1.ability;
 
-        // Memasukkan Teks Informasi Karakter 2
         document.getElementById("name-f2").innerText = data.f2.name;
         document.getElementById("origin-f2").innerText = `Asal: ${data.f2.origin}`;
         document.getElementById("tier-f2").innerText = data.f2.tier;
         document.getElementById("desc-f2").innerText = data.f2.desc;
         document.getElementById("ability-f2").innerText = data.f2.ability;
 
-        // Hasil Kesimpulan Juri AI
         document.getElementById("battle-winner").innerText = data.winner;
         document.getElementById("battle-reason").innerText = data.reason;
 
-        // Render Bar Grafik & Nama Tier per Baris Stat
         const stats = ["str", "spd", "dur", "iq", "pwr", "stam"];
         stats.forEach(stat => {
             const valF1 = data.f1[stat];
@@ -110,42 +117,37 @@ battleBtn.addEventListener("click", async () => {
         alert("Gagal memproses analisis pertarungan!");
     } finally {
         loadingArea.style.display = "none";
-        battleBtn.disabled = false;
-        checkF1Btn.disabled = false;
-        checkF2Btn.disabled = false;
+        toggleButtons(false);
     }
 });
 
-// --- 2. PROSES TOMBOL CEK DATA SINGLE CHAR ---
+// --- 2. PROSES CEK DATA SINGLE ---
 checkF1Btn.addEventListener("click", () => {
-    const charName = f1Input.value.trim();
-    if (!charName) return alert("Masukkan nama karakter di kolom Karakter 1 terlebih dahulu!");
-    checkCharacterData(charName);
+    const name = p1Nama.value.trim();
+    const origin = p1Asal.value.trim();
+    if (!name || !origin) return alert("Isi Nama dan Asal Anime Petarung 1 dulu!");
+    checkCharacterData(`${name} dari seri ${origin}`);
 });
 
 checkF2Btn.addEventListener("click", () => {
-    const charName = f2Input.value.trim();
-    if (!charName) return alert("Masukkan nama karakter di kolom Karakter 2 terlebih dahulu!");
-    checkCharacterData(charName);
+    const name = p2Nama.value.trim();
+    const origin = p2Asal.value.trim();
+    if (!name || !origin) return alert("Isi Nama dan Asal Anime Petarung 2 dulu!");
+    checkCharacterData(`${name} dari seri ${origin}`);
 });
 
-async function checkCharacterData(charName) {
+async function checkCharacterData(charFullInput) {
     loadingArea.style.display = "block";
     arenaDisplay.style.display = "none"; 
     previewDisplay.style.display = "none";
-    
-    battleBtn.disabled = true;
-    checkF1Btn.disabled = true;
-    checkF2Btn.disabled = true;
+    toggleButtons(true);
     resetBars();
-
-    const finalChar = charName.toLowerCase().includes("dari") ? charName : `${charName} (Karakter Anime/Manga/Webtoon)`;
 
     try {
         const response = await fetch('/api/checkcharacter', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ karakter: finalChar })
+            body: JSON.stringify({ karakter: charFullInput })
         });
 
         const data = await response.json();
@@ -174,8 +176,6 @@ async function checkCharacterData(charName) {
         alert("Gagal mengecek data karakter!");
     } finally {
         loadingArea.style.display = "none";
-        battleBtn.disabled = false;
-        checkF1Btn.disabled = false;
-        checkF2Btn.disabled = false;
+        toggleButtons(false);
     }
 }

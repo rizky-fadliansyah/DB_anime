@@ -1,4 +1,3 @@
-/* ================= GLOBAL BASE RESETS ================= */
 * {
     margin: 0;
     padding: 0;
@@ -36,7 +35,7 @@ h1 {
     margin-bottom: 30px;
 }
 
-/* ================= GRUP INPUT & LAYOUT UTAMA ================= */
+/* ================= THE NEW FORM GRID LAYOUT ================= */
 .battle-input-group {
     background: #1f2833;
     padding: 25px;
@@ -44,81 +43,82 @@ h1 {
     border: 1px solid #45f3ff;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
     margin-bottom: 30px;
-    display: flex;
-    flex-direction: column;
+}
+
+.grid-inputs {
+    display: grid;
+    grid-template-columns: 1fr 180px 1fr;
+    align-items: center;
     gap: 20px;
 }
 
-.input-row {
+.input-card {
+    background: #0b0c10;
+    padding: 20px;
+    border-radius: 10px;
+    border: 1px solid #555;
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
+    gap: 12px;
+    text-align: left;
+}
+
+.input-card h3 {
+    font-size: 0.95rem;
+    color: #86c232;
+    letter-spacing: 1px;
+    border-bottom: 1px solid #333;
+    padding-bottom: 5px;
+}
+
+.input-card input {
+    width: 100%;
+    padding: 12px;
+    border-radius: 6px;
+    border: 1px solid #45f3ff;
+    background: #1f2833;
+    color: #fff;
+    font-size: 14px;
+    outline: none;
+}
+
+.vs-center-action {
+    display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
     gap: 15px;
-    width: 100%;
-}
-
-.input-row input {
-    flex: 1;
-    padding: 14px 18px;
-    border-radius: 8px;
-    border: 2px solid #45f3ff;
-    background: #0b0c10;
-    color: #fff;
-    font-size: 16px;
-    outline: none;
-    transition: all 0.3s ease;
-    min-width: 0;
-}
-
-.input-row input:focus {
-    box-shadow: 0 0 15px rgba(69, 243, 255, 0.5);
 }
 
 .vs-text {
     font-weight: 900;
     color: #ff0055;
-    font-size: 22px;
+    font-size: 32px;
     text-shadow: 0 0 10px rgba(255, 0, 85, 0.4);
 }
 
-/* GRUP LAYOUT TOMBOL */
-.btn-group {
-    display: flex;
-    flex-direction: row;
-    gap: 12px;
-    width: 100%;
-    justify-content: center;
-}
-
-.btn-group button {
-    flex: 1;
-    padding: 14px 20px;
-    font-size: 13px;
+/* TOMBOL UTAMA STYLING */
+button {
+    padding: 12px 15px;
+    font-size: 12px;
     font-weight: bold;
     text-transform: uppercase;
     border: none;
-    border-radius: 8px;
+    border-radius: 6px;
     cursor: pointer;
-    transition: transform 0.2s, background-color 0.3s;
+    transition: all 0.2s;
     color: #fff;
+    width: 100%;
 }
 
-.btn-group button:active { transform: scale(0.97); }
+button:active { transform: scale(0.97); }
+button:disabled { background-color: #555 !important; color: #aaa !important; cursor: not-allowed; }
 
-.btn-group button:disabled {
-    background-color: #555 !important;
-    color: #aaa !important;
-    cursor: not-allowed;
-    box-shadow: none !important;
-}
+#check-f1-btn { background-color: #28a745; }
+#check-f2-btn { background-color: #17a2b8; }
+#battle-btn { background-color: #ff0055; padding: 15px 20px; font-size: 14px; box-shadow: 0 4px 15px rgba(255, 0, 85, 0.4); }
 
-#check-f1-btn { background-color: #28a745; box-shadow: 0 4px 10px rgba(40, 167, 69, 0.2); }
-#check-f2-btn { background-color: #17a2b8; box-shadow: 0 4px 10px rgba(23, 162, 184, 0.2); }
-#battle-btn { background-color: #ff0055; box-shadow: 0 4px 15px rgba(255, 0, 85, 0.4); font-size: 14px;}
-#battle-btn:hover { background-color: #e0004c; }
-
-/* ================= LOADING ANIMASI ================= */
+/* ================= LOADING STYLING ================= */
 .loading-status { margin: 30px 0; }
 .spinner {
     width: 45px;
@@ -131,7 +131,7 @@ h1 {
 }
 @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-/* ================= KARTU KARAKTER & GRAFIK BAR ================= */
+/* ================= KARTU GRAFIK BAR ================= */
 .fighter-card {
     background: #1f2833;
     border-radius: 12px;
@@ -144,15 +144,7 @@ h1 {
 }
 
 .display-center-card { margin: 30px auto; max-width: 450px; }
-
-.card-header-flex {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 5px;
-}
-
+.card-header-flex { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 5px; }
 .fighter-card h2 { color: #fff; font-size: 1.4rem; }
 
 .tier-badge {
@@ -163,7 +155,6 @@ h1 {
     padding: 4px 10px;
     border-radius: 20px;
     text-transform: uppercase;
-    box-shadow: 0 0 10px rgba(255,0,85,0.4);
     white-space: nowrap;
 }
 
@@ -171,7 +162,6 @@ h1 {
 .char-info-text { font-size: 13px; color: #a8a9ad; line-height: 1.4; margin-top: 4px; }
 .char-info-text strong { color: #fff; }
 
-/* PROGRESS STAT CONTAINER */
 .stat-bar-container {
     background: #0b0c10;
     position: relative;
@@ -189,33 +179,10 @@ h1 {
     transition: width 1s cubic-bezier(0.1, 0.8, 0.3, 1);
 }
 
-.stat-label {
-    position: absolute;
-    left: 10px;
-    top: 50%;
-    transform: translateY(-50%);
-    font-size: 11px;
-    font-weight: bold;
-    color: #fff;
-    text-transform: uppercase;
-    text-shadow: 1px 1px 2px #000;
-    z-index: 2;
-}
+.stat-label { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); font-size: 11px; font-weight: bold; color: #fff; z-index: 2; }
+.stat-num { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); font-size: 10px; font-weight: 800; color: #ffc107; z-index: 2; }
 
-.stat-num {
-    position: absolute;
-    right: 10px;
-    top: 50%;
-    transform: translateY(-50%);
-    font-size: 10px;
-    font-weight: 800;
-    color: #ffc107;
-    text-shadow: 1px 1px 3px #000, -1px -1px 3px #000;
-    text-transform: uppercase;
-    z-index: 2;
-}
-
-/* ================= ARENA BATTLE LAYOUT ================= */
+/* ================= ARENA LAYOUT DUEL ================= */
 .arena-layout {
     display: flex;
     flex-direction: row;
@@ -226,51 +193,17 @@ h1 {
     width: 100%;
 }
 
-.arena-center {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 15px;
-    align-self: center;
-}
-
-.winner-announcement {
-    background: #0b0c10;
-    padding: 15px 25px;
-    border-radius: 10px;
-    border: 2px dashed #ffc107;
-    box-shadow: 0 0 15px rgba(255, 193, 7, 0.2);
-    width: 100%;
-}
-
+.arena-center { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 15px; align-self: center; }
+.winner-announcement { background: #0b0c10; padding: 15px 25px; border-radius: 10px; border: 2px dashed #ffc107; width: 100%; }
 .winner-announcement h3 { color: #ffc107; font-size: 0.9rem; }
-#battle-winner { color: #fff; font-size: 1.6rem; text-shadow: 0 0 10px rgba(255, 255, 255, 0.4); }
+#battle-winner { color: #fff; font-size: 1.6rem; }
+.reason-box { background: #1f2833; padding: 18px; border-radius: 8px; border-left: 5px solid #ff0055; text-align: left; line-height: 1.5; font-size: 0.9rem; width: 100%; }
 
-.reason-box {
-    background: #1f2833;
-    padding: 18px;
-    border-radius: 8px;
-    border-left: 5px solid #ff0055;
-    text-align: left;
-    line-height: 1.5;
-    font-size: 0.9rem;
-    width: 100%;
-}
-
-/* ================= MEDIA QUERY RESPONSIVE (LAPTOP BREAKDOWN / MOBILE) ================= */
+/* ================= BREAKDOWN RESPONSIVE ================= */
 @media (max-width: 880px) {
-    .arena-layout {
-        flex-direction: column;
-        align-items: center;
-        gap: 25px;
-    }
+    .grid-inputs { grid-template-columns: 1fr; gap: 15px; }
+    .vs-center-action { order: initial; padding: 10px 0; }
+    .arena-layout { flex-direction: column; align-items: center; gap: 25px; }
     .fighter-card { max-width: 100%; }
     .arena-center { order: -1; width: 100%; }
-}
-
-@media (max-width: 600px) {
-    .input-row { flex-direction: column; }
-    .btn-group { flex-direction: column; }
-    h1 { font-size: 1.6rem; }
 }
