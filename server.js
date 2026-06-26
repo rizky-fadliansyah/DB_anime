@@ -14,12 +14,12 @@ const GROQ_API_KEY = process.env.GROQ_API_KEY;
 app.post('/api/deathbattle', async (req, res) => {
     try {
         const { karakter1, karakter2 } = req.body;
-        const systemPrompt = `Kamu adalah juri Death Battle Anime profesional, objektif, dan sangat detail. 
-Analisis pertarungan ini secara mendalam dengan membandingkan aspek kecepatan (Speed scaling), daya hancur (Attack Potency), ketahanan (Durability), serta kemampuan khusus/hax dari kedua karakter.
+        const systemPrompt = `Kamu adalah bot juri Death Battle Anime profesional yang menggunakan database resmi VS BATTLES WIKI sebagai satu-satunya kiblat akurat. 
 
-Berikan penjelasan kesimpulan (reason) yang panjang, berbobot, dan logis (minimal 3-5 kalimat) mengapa karakter tersebut bisa menang atau mengapa pertarungan berjalan sepihak.
-
-Tambahkan "tier" kekuatan karakter secara keseluruhan (misal: Street, Building, Mountain, Island, Planet, Multiverse, dll), "desc" (deskripsi singkat 1 kalimat), dan "ability" (kemampuan utama karakter).
+Tugasmu:
+1. Ambil data tingkat kekuatan (Attack Potency), Kecepatan (Speed), dan Kemampuan (Hax) kedua karakter murni berdasarkan artikel mereka di VS BATTLES WIKI. Jangan pernah mengarang data di luar standar tersebut.
+2. Tulis "tier" keseluruhan karakter persis sesuai penamaan tier di VS Battles Wiki (misal: Tier 9-B: Wall level, Tier 6-C: Island level, Tier 3-A: Universe level, Tier 2-A: Multiverse level, dll).
+3. Berikan "reason" (analisis kemenangan) minimal 3-5 kalimat yang logis dengan membandingkan stat kecepatan (misal: FTL vs Subsonic) dan kemampuan khusus/hax (misal: Reality Warping, Regeneration) sesuai perdebatan di forum VS Battles Wiki.
 
 Kembalikan JSON MURNI dengan format berikut:
 {
@@ -45,8 +45,13 @@ Kembalikan JSON MURNI dengan format berikut:
 app.post('/api/checkcharacter', async (req, res) => {
     try {
         const { karakter } = req.body;
-        const checkPrompt = `Kamu adalah ensiklopedia anime, manga, dan webtoon resmi yang sangat akurat.
-Tambahkan "tier" kekuatan karakter secara keseluruhan (misal: City, Continent, Star, Boundless, dll), "desc" (deskripsi singkat 1 kalimat), dan "ability" (kemampuan utama karakter).
+        const checkPrompt = `Kamu adalah API pencari data karakter resmi yang terhubung secara logis dengan standar VS BATTLES WIKI. 
+
+Tugasmu:
+1. Cari profil karakter ini di VS Battles Wiki. 
+2. Isi bagian "tier" persis sesuai klasifikasi tier di VS Battles Wiki (misal: 7-A: Mountain level, 5-A: Planet level, Low 2-C, dll).
+3. Untuk nilai "str", "spd", "dur", "iq", "pwr", "stam", konversikan tier mereka di wiki menjadi angka 10-100 secara akurat (Contoh: Jika kecepatannya FTL kasih nilai spd 88, jika MFTL+ kasih nilai 95+).
+
 Kembalikan JSON MURNI dengan format berikut:
 {
   "name": "...", "origin": "...", "tier": "...", "desc": "...", "ability": "...", "str": 70, "spd": 80, "dur": 65, "iq": 85, "pwr": 75, "stam": 70
