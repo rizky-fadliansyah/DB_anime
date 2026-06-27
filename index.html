@@ -3,110 +3,75 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Anime Scaling Power & Battle Arena (Groq AI)</title>
+    <title>VS Battles Arena - Eksplorasi Karakter</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <div class="container">
-        <h1>⚔️ Anime Scaling Power Arena</h1>
-        <p class="subtitle">Gunakan Standar Akurat Versus Battles Wiki</p>
+    <div class="wrapper">
+        <h1>🏟️ VS Battles Arena</h1>
+        <p class="subtitle">Database & Analisis Karakter Berdasarkan Request TikTok</p>
 
-        <div class="battle-input-group">
-            <div class="grid-inputs">
-                <div class="input-card">
-                    <h3>👤 PETARUNG 1</h3>
-                    <input type="text" id="p1-nama" placeholder="Nama (Misal: Saitama)">
-                    <input type="text" id="p1-asal" placeholder="Asal Anime (Misal: One Punch Man)">
-                    <button id="check-f1-btn">CEK DATA CHAR 1 🔍</button>
-                </div>
-
-                <div class="vs-center-action">
-                    <span class="vs-text">VS</span>
-                    <button id="battle-btn">MULAI DUEL! 🏟️</button>
-                </div>
-
-                <div class="input-card">
-                    <h3>👤 PETARUNG 2</h3>
-                    <input type="text" id="p2-nama" placeholder="Nama (Misal: Goku)">
-                    <input type="text" id="p2-asal" placeholder="Asal Anime (Misal: Dragon Ball Super)">
-                    <button id="check-f2-btn">CEK DATA CHAR 2 🔍</button>
-                </div>
-            </div>
+        <div style="text-align: center; margin-bottom: 20px;">
+            <a href="battle.html" class="btn-form-opt" style="display: inline-block; padding: 12px 25px; background: #ff0055; color: #fff; text-decoration: none; font-weight: bold; border-radius: 8px; border: 2px solid #ff3377; box-shadow: 0 0 15px rgba(255, 0, 85, 0.4);">
+                ⚔️ MASUK KE BATTLE ARENA (1 VS 1)
+            </a>
         </div>
 
-        <div id="loading" class="loading-status" style="display: none;">
-            <div class="spinner"></div>
-            <p>Groq AI sedang mencocokkan data dengan VS Battles Wiki...</p>
+        <div id="global-slot-indicator" style="display: flex; justify-content: center; gap: 15px; margin-bottom: 25px; font-size: 13px; font-weight: bold;">
+            <span id="global-status-p1" style="color: #ff0055; background: #111; padding: 6px 14px; border-radius: 20px; border: 1px solid #ffffff; box-shadow: 0 0 10px rgba(255, 0, 85, 0.2);">
+                🔴 P1: Memuat...
+            </span>
+            <span id="global-status-p2" style="color: #00ff55; background: #111; padding: 6px 14px; border-radius: 20px; border: 1px solid #ffffff; box-shadow: 0 0 10px rgba(0, 255, 85, 0.2);">
+                🟢 P2: Memuat...
+            </span>
         </div>
 
-        <div id="preview-display" class="fighter-card display-center-card" style="display: none;">
-            <div class="card-header-flex">
-                <h2 id="prev-name">Nama Karakter</h2>
-                <span id="prev-tier" class="tier-badge">Tier</span>
-            </div>
-            <p id="prev-origin" class="char-origin"></p>
-            <p class="char-info-text"><strong>Bio:</strong> <span id="prev-desc">-</span></p>
-            <p class="char-info-text" style="margin-bottom: 15px;"><strong>Skill:</strong> <span id="prev-ability">-</span></p>
-            
-            <div class="stat-bar-container"><div class="stat-fill" id="bar-str-prev"></div><span class="stat-label">Strength</span><span id="val-str-prev" class="stat-num">-</span></div>
-            <div class="stat-bar-container"><div class="stat-fill" id="bar-spd-prev"></div><span class="stat-label">Speed</span><span id="val-spd-prev" class="stat-num">-</span></div>
-            <div class="stat-bar-container"><div class="stat-fill" id="bar-dur-prev"></div><span class="stat-label">Durability</span><span id="val-dur-prev" class="stat-num">-</span></div>
-            <div class="stat-bar-container"><div class="stat-fill" id="bar-iq-prev"></div><span class="stat-label">Battle IQ</span><span id="val-iq-prev" class="stat-num">-</span></div>
-            <div class="stat-bar-container"><div class="stat-fill" id="bar-pwr-prev"></div><span class="stat-label">Powers/Hax</span><span id="val-pwr-prev" class="stat-num">-</span></div>
-            <div class="stat-bar-container"><div class="stat-fill" id="bar-stam-prev"></div><span class="stat-label">Stamina</span><span id="val-stam-prev" class="stat-num">-</span></div>
+        <div class="search-box-container" style="text-align: center; margin-bottom: 25px;">
+            <input type="text" id="search-char" placeholder="🔍 Cari nama karakter atau asal seri..." 
+                   style="padding: 12px 20px; width: 100%; max-width: 500px; border-radius: 25px; border: 2px solid #333; background: #111; color: #fff; font-size: 14px; outline: none; transition: border-color 0.3s ease;">
         </div>
 
-        <div id="arena-display" class="arena-layout" style="display: none;">
-            
-            <div class="fighter-card">
-                <div class="card-header-flex">
-                    <h2 id="name-f1">Karakter 1</h2>
-                    <span id="tier-f1" class="tier-badge">Tier</span>
-                </div>
-                <p id="origin-f1" class="char-origin"></p>
-                <p class="char-info-text"><strong>Bio:</strong> <span id="desc-f1">-</span></p>
-                <p class="char-info-text" style="margin-bottom: 15px;"><strong>Skill:</strong> <span id="ability-f1">-</span></p>
-                
-                <div class="stat-bar-container"><div class="stat-fill" id="bar-str-f1"></div><span class="stat-label">Strength</span><span id="val-str-f1" class="stat-num">-</span></div>
-                <div class="stat-bar-container"><div class="stat-fill" id="bar-spd-f1"></div><span class="stat-label">Speed</span><span id="val-spd-f1" class="stat-num">-</span></div>
-                <div class="stat-bar-container"><div class="stat-fill" id="bar-dur-f1"></div><span class="stat-label">Durability</span><span id="val-dur-f1" class="stat-num">-</span></div>
-                <div class="stat-bar-container"><div class="stat-fill" id="bar-iq-f1"></div><span class="stat-label">Battle IQ</span><span id="val-iq-f1" class="stat-num">-</span></div>
-                <div class="stat-bar-container"><div class="stat-fill" id="bar-pwr-f1"></div><span class="stat-label">Powers/Hax</span><span id="val-pwr-f1" class="stat-num">-</span></div>
-                <div class="stat-bar-container"><div class="stat-fill" id="bar-stam-f1"></div><span class="stat-label">Stamina</span><span id="val-stam-f1" class="stat-num">-</span></div>
+        <div class="nav-header">
+            <h2>Pilih Karakter Untuk Dieksplorasi</h2>
+        </div>
+        <div class="char-grid" id="grid-container"></div>
+
+        <div class="form-selection-zone" id="detail-zone">
+            <h2 id="detail-char-name" style="color: #00ffff; margin-bottom: 5px;">Nama Karakter</h2>
+            <p id="detail-char-origin" style="color: #aaa; font-size: 14px; margin-bottom: 20px;">Asal Seri</p>
+
+            <div class="form-title">Pilih Form / Variasi Kekuatan:</div>
+            <div class="form-btn-group" id="form-options-container"></div>
+
+            <div id="loading" style="display:none; color:#ffc107; font-weight:bold; font-size:14px; margin: 20px 0; text-align: center;">
+                🤖 AI Juri sedang meriset memori VS Battles Wiki untuk form ini...
             </div>
 
-            <div class="arena-center">
-                <div class="winner-announcement">
-                    <h3>🏆 PEMENANG:</h3>
-                    <h1 id="battle-winner">?</h1>
-                </div>
-                <div class="reason-box">
-                    <p id="battle-reason">Alasan kemenangan...</p>
+            <div class="arena-box" id="research-result" style="margin-top: 25px;">
+                <div class="fighter-display">
+                    <img src="" id="char-form-img" class="arena-avatar p1-border" alt="Form Image">
+                    <div style="width: 100%;">
+                        <h3 id="res-form-name" style="color: #ff0055;">Nama Form</h3>
+                        <div class="tier-text" id="res-form-tier">Tier: -</div>
+                        
+                        <div id="res-stats" style="margin: 15px 0;"></div>
+
+                        <div style="margin-top: 15px;">
+                            <strong style="color: #ffc107; display: block; margin-bottom: 5px;">🔮 Kemampuan Kunci & Hax:</strong>
+                            <p id="res-form-ability" style="background: #1f2833; padding: 10px; border-radius: 6px; border-left: 3px solid #ffc107; text-align: left;"></p>
+                        </div>
+
+                        <div style="margin-top: 15px;">
+                            <strong style="color: #00ff55; display: block; margin-bottom: 5px;">💪 Kondisi Fisik & Atribut:</strong>
+                            <p id="res-form-desc" style="background: #1f2833; padding: 10px; border-radius: 6px; border-left: 3px solid #00ff55; text-align: left;"></p>
+                        </div>
+                    </div>
                 </div>
             </div>
-
-            <div class="fighter-card">
-                <div class="card-header-flex">
-                    <h2 id="name-f2">Karakter 2</h2>
-                    <span id="tier-f2" class="tier-badge">Tier</span>
-                </div>
-                <p id="origin-f2" class="char-origin"></p>
-                <p class="char-info-text"><strong>Bio:</strong> <span id="desc-f2">-</span></p>
-                <p class="char-info-text" style="margin-bottom: 15px;"><strong>Skill:</strong> <span id="ability-f2">-</span></p>
-                
-                <div class="stat-bar-container"><div class="stat-fill" id="bar-str-f2"></div><span class="stat-label">Strength</span><span id="val-str-f2" class="stat-num">-</span></div>
-                <div class="stat-bar-container"><div class="stat-fill" id="bar-spd-f2"></div><span class="stat-label">Speed</span><span id="val-spd-f2" class="stat-num">-</span></div>
-                <div class="stat-bar-container"><div class="stat-fill" id="bar-dur-f2"></div><span class="stat-label">Durability</span><span id="val-dur-f2" class="stat-num">-</span></div>
-                <div class="stat-bar-container"><div class="stat-fill" id="bar-iq-f2"></div><span class="stat-label">Battle IQ</span><span id="val-iq-f2" class="stat-num">-</span></div>
-                <div class="stat-bar-container"><div class="stat-fill" id="bar-pwr-f2"></div><span class="stat-label">Powers/Hax</span><span id="val-pwr-f2" class="stat-num">-</span></div>
-                <div class="stat-bar-container"><div class="stat-fill" id="bar-stam-f2"></div><span class="stat-label">Stamina</span><span id="val-stam-f2" class="stat-num">-</span></div>
-            </div>
-
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <script src="script.js"></script>
 </body>
 </html>

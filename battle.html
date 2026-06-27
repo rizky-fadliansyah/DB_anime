@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VS Battles Arena - Layar Duel</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="wrapper">
+        <h1>🏟️ VS Battles Arena</h1>
+        <p class="subtitle">Layar Simulasi Pertarungan AI</p>
+
+        <div class="nav-header">
+            <h2>Layar Pertarungan</h2>
+            <button class="btn-page secondary" onclick="window.location.href='index.html'">⬅️ KEMBALI LIHAT CHAR</button>
+        </div>
+
+        <div class="selection-container">
+            <div class="slot">
+                <div class="p1-label">Petarung 1</div>
+                <div class="slot-name" id="status-p1" style="color: #ff0055;">Memuat...</div>
+            </div>
+            <div class="vs-circle">VS</div>
+            <div class="slot">
+                <div class="p2-label">Petarung 2</div>
+                <div class="slot-name" id="status-p2" style="color: #00ff55;">Memuat...</div>
+            </div>
+        </div>
+
+        <button class="btn-battle" id="btn-action">MULAI DUEL MAKSIMAL! ⚔️</button>
+
+        <div id="loading" style="display: none; text-align: center; margin: 20px 0; color: #ffc107; font-weight: bold;">
+            Memproses Analisis Form Spesifik dari VS Battles Wiki...
+        </div>
+
+        <div class="arena-box" id="arena-result" style="display: none;">
+            
+            <!-- === DISPLAY PETARUNG 1 === -->
+            <div class="fighter-display">
+                <img src="" id="f1-img" class="arena-avatar p1-border" alt="P1">
+                <div style="width: 100%; text-align: left;">
+                    <h3 id="f1-name">Name 1</h3>
+                    <div class="tier-text" id="f1-tier">Tier</div>
+                    
+                    <!-- PERBAIKAN: Wadah grafik bar stat untuk Petarung 1 -->
+                    <div id="f1-stats" style="margin: 15px 0;"></div>
+                    
+                    <p id="f1-desc" style="white-space: pre-line; background: #1f2833; padding: 10px; border-radius: 6px; border-left: 3px solid #ff0055;"></p>
+                </div>
+            </div>
+
+            <!-- === DISPLAY PETARUNG 2 === -->
+            <div class="fighter-display">
+                <img src="" id="f2-img" class="arena-avatar p2-border" alt="P2">
+                <div style="width: 100%; text-align: left;">
+                    <h3 id="f2-name">Name 2</h3>
+                    <div class="tier-text" id="f2-tier">Tier</div>
+                    
+                    <!-- PERBAIKAN: Wadah grafik bar stat untuk Petarung 2 -->
+                    <div id="f2-stats" style="margin: 15px 0;"></div>
+                    
+                    <p id="f2-desc" style="white-space: pre-line; background: #1f2833; padding: 10px; border-radius: 6px; border-left: 3px solid #00ff55;"></p>
+                </div>
+            </div>
+            
+            <!-- === KOTAK ALASAN / HASIL === -->
+            <div class="reason-box" style="width: 100%; margin-top: 20px; text-align: left;">
+                <strong id="battle-winner" style="font-size: 18px; color: #ffcc00; display: block; margin-bottom: 8px;">JUARA: ?</strong>
+                <p id="battle-reason" style="background: #111; padding: 15px; border-radius: 6px; border: 1px solid #333; line-height: 1.6;"></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- PANGGIL SCRIPT EKSTERNAL DI SINI -->
+    <script src="battle.js"></script>
+</body>
+</html>

@@ -1,181 +1,289 @@
-const battleBtn = document.getElementById("battle-btn");
-const checkF1Btn = document.getElementById("check-f1-btn");
-const checkF2Btn = document.getElementById("check-f2-btn");
-
-const p1Nama = document.getElementById("p1-nama");
-const p1Asal = document.getElementById("p1-asal");
-const p2Nama = document.getElementById("p2-nama");
-const p2Asal = document.getElementById("p2-asal");
-
+// --- ELEMEN DOM ---
+const gridContainer = document.getElementById("grid-container");
+const detailZone = document.getElementById("detail-zone");
+const formOptionsContainer = document.getElementById("form-options-container");
 const loadingArea = document.getElementById("loading");
-const arenaDisplay = document.getElementById("arena-display");
-const previewDisplay = document.getElementById("preview-display");
 
-// Fungsi Konversi Skala Khusus Kecepatan (SPEED)
-function getSpeedTier(value) {
-    const num = parseInt(value);
-    if (num >= 95) return "MFTL+";
-    if (num >= 87) return "FTL";
-    if (num >= 78) return "Relativistic";
-    if (num >= 68) return "M-Hypersonic";
-    if (num >= 58) return "Hypersonic";
-    if (num >= 48) return "Supersonic";
-    if (num >= 38) return "Subsonic";
-    if (num >= 23) return "Superhuman";
-    return "Normal Human";
+const researchResult = document.getElementById("research-result");
+const charFormImg = document.getElementById("char-form-img");
+const resFormName = document.getElementById("res-form-name");
+const resFormTier = document.getElementById("res-form-tier");
+const resFormAbility = document.getElementById("res-form-ability");
+const resFormDesc = document.getElementById("res-form-desc");
+
+// Container utama grafik chart bar stat
+const resStatsContainer = document.getElementById("res-stats");
+// Elemen input pencarian baru
+const searchInput = document.getElementById("search-char");
+
+let characterMap = {};
+
+// --- HELPER: KONVERSI ANGKA KE ISTILAH VS BATTLES WIKI ---
+function dapatkanLabelStat(tipe, nilai) {
+    if (tipe === "Speed") {
+        if (nilai >= 95) return "⚡ Immeasurable";
+        if (nilai >= 85) return "🚀 MFTL+ (Massively FTL+)";
+        if (nilai >= 75) return "✨ FTL (Faster Than Light)";
+        if (nilai >= 60) return "🔥 Relativistic";
+        if (nilai >= 45) return "🌪️ Massively Hypersonic";
+        if (nilai >= 30) return "💨 Supersonic / Hypersonic";
+        return "🚶 Human to Subsonic";
+    }
+    if (tipe === "Strength" || tipe === "Durability") {
+        if (nilai >= 95) return "🌌 Outerversal / Boundless";
+        if (nilai >= 85) return "🪐 Multiverse to Universal";
+        if (nilai >= 70) return "🌟 Star to Solar System";
+        if (nilai >= 55) return "🌍 Planet to Continental";
+        if (nilai >= 40) return "🏔️ Mountain to Island level";
+        if (nilai >= 25) return "🏢 City to Town level";
+        return "🚗 Street to Wall level";
+    }
+    if (tipe === "Intelligence") {
+        if (nilai >= 90) return "🧠 Omniscient / Nigh-Omniscient";
+        if (nilai >= 75) return "🎖️ Supergenius / Extraordinary Gen";
+        if (nilai >= 55) return "📚 Genius / Gifted";
+        return "👤 Above Average / Normal";
+    }
+    if (tipe === "Stamina") {
+        if (nilai >= 90) return "🔋 Infinite / Infinite Self-Sustaining";
+        if (nilai >= 75) return "🏃 Extremely High (Days of fight)";
+        if (nilai >= 50) return "💪 Very High (Hours of fight)";
+        return "👤 Athletic to Normal";
+    }
+    // Default untuk Powers/Hax
+    if (nilai >= 85) return "🔮 Godly / Reality Warping Hax";
+    if (nilai >= 65) return "✨ High Tier Hax (Time/Space/Concept)";
+    if (nilai >= 45) return "⚔️ Mid Tier (Elemental/Energy Manipulation)";
+    return "👊 Low Tier / Basic Combat Abilities";
 }
 
-// Fungsi Konversi Skala Umum (Strength, Durability, Powers, Stamina)
-function getGeneralPowerTier(value) {
-    const num = parseInt(value);
-    if (num >= 95) return "Outerversal";
-    if (num >= 88) return "Planet Lvl";
-    if (num >= 80) return "Continent Lvl";
-    if (num >= 70) return "Island Lvl";
-    if (num >= 60) return "Mountain Lvl";
-    if (num >= 50) return "City Lvl";
-    if (num >= 38) return "Building Lvl";
-    if (num >= 23) return "Superhuman";
-    return "Street Lvl";
+// --- HELPER: TEMPLATE GENERATOR UNTUK STAT BAR CHART ---
+function buatStatBar(label, nilai, tipeStat) {
+    const labelVsWiki = dapatkanLabelStat(tipeStat, nilai);
+    let warnaBar = "linear-gradient(90deg, #00ff55, #00aaff)";
+    if (tipeStat === "Speed") warnaBar = "linear-gradient(90deg, #ffcc00, #ff6600)";
+    if (tipeStat === "Strength") warnaBar = "linear-gradient(90deg, #ff0055, #990022)";
+
+    return `
+        <div style="background: #111; padding: 10px; border-radius: 6px; border-left: 4px solid #333; margin-bottom: 5px; text-align: left;">
+            <div style="display:flex; justify-content:space-between; font-size:12px; font-weight:bold; color:#fff; margin-bottom: 4px;">
+                <span>${label}</span>
+                <span style="color: #00ffcc;">${labelVsWiki}</span>
+            </div>
+            <div style="background: #222; height: 10px; width: 100%; border-radius: 5px; overflow: hidden; box-shadow: inset 0 1px 3px rgba(0,0,0,0.5);">
+                <div style="height: 100%; width: ${nilai}%; background: ${warnaBar}; transition: width 1s cubic-bezier(0.1, 0.8, 0.3, 1);"></div>
+            </div>
+        </div>
+    `;
 }
 
-function resetBars() {
-    document.querySelectorAll(".stat-fill").forEach(bar => bar.style.width = "0%");
-    document.querySelectorAll(".stat-num").forEach(num => num.innerText = "-");
+// --- 1. AMBIL DATA DARI BACKEND ---
+async function loadCharacters() {
+    try {
+        const res = await fetch('/api/characters');
+        if (!res.ok) throw new Error("Gagal ambil data");
+        const rawData = await res.json();
+        
+        characterMap = {};
+        rawData.forEach(item => {
+            if (!characterMap[item.char_id]) {
+                characterMap[item.char_id] = {
+                    id: item.char_id,
+                    name: item.name,
+                    origin: item.origin,
+                    char_image: item.char_image, 
+                    forms: []
+                };
+            }
+            characterMap[item.char_id].forms.push({
+                form_id: item.form_id,
+                form_name: item.form_name,
+                image_url: item.form_image 
+            });
+        });
+        renderCharacterGrid(""); // Panggil dengan keyword kosong saat awal muat
+    } catch (err) {
+        console.error("Error loadCharacters:", err);
+        alert("Gagal memuat database karakter! Cek terminal server.");
+    }
 }
 
-function toggleButtons(status) {
-    battleBtn.disabled = status;
-    checkF1Btn.disabled = status;
-    checkF2Btn.disabled = status;
+// --- 2. RENDER GRID (DENGAN COCOKAN SEARCH FILTER) ---
+function renderCharacterGrid(keyword = "") {
+    if (!gridContainer) return;
+    gridContainer.innerHTML = "";
+
+    const lowerKeyword = keyword.toLowerCase().trim();
+
+    Object.values(characterMap).forEach(char => {
+        // Cek apakah nama karakter atau asal seri cocok dengan keyword pencarian
+        const namaCocok = char.name.toLowerCase().includes(lowerKeyword);
+        const asalCocok = char.origin.toLowerCase().includes(lowerKeyword);
+
+        if (!namaCocok && !asalCocok) return; // Lewati jika tidak cocok
+
+        const card = document.createElement("div");
+        card.className = "char-card";
+        
+        // Memakai fallback jika char_image kosong
+        const coverImg = char.char_image ? `/images/${char.char_image}` : (char.forms[0]?.image_url ? `/images/${char.forms[0].image_url}` : 'https://placehold.co/150');
+
+        card.innerHTML = `<img src="${coverImg}" class="char-thumb" alt="${char.name}"><h3>${char.name}</h3><p>${char.origin}</p>`;
+
+        card.addEventListener("click", () => {
+            document.querySelectorAll('.char-card').forEach(c => c.classList.remove('active-focus'));
+            card.classList.add('active-focus');
+            bukaDetailKarakter(char);
+        });
+        gridContainer.appendChild(card);
+    });
 }
 
-// --- 1. PROSES MULAI BATTLE ARENA ---
-battleBtn.addEventListener("click", async () => {
-    const name1 = p1Nama.value.trim();
-    const origin1 = p1Asal.value.trim();
-    const name2 = p2Nama.value.trim();
-    const origin2 = p2Asal.value.trim();
+// --- 3. FITUR EVENT LISTENER UNTUK SEARCH BAR ---
+if (searchInput) {
+    searchInput.addEventListener("input", (e) => {
+        renderCharacterGrid(e.target.value);
+    });
+}
 
-    if (!name1 || !origin1 || !name2 || !origin2) {
-        return alert("Kolom Nama dan Asal Anime untuk kedua petarung wajib diisi, Ky!");
+// --- 4. DETAIL & ACTION (Gabungan) ---
+// --- 4. DETAIL & ACTION (Gabungan) ---
+function bukaDetailKarakter(char) {
+    if (!detailZone) return;
+    
+    document.getElementById("detail-char-name").innerText = char.name;
+    document.getElementById("detail-char-origin").innerText = char.origin;
+    formOptionsContainer.innerHTML = "";
+    researchResult.style.display = "none";
+    detailZone.classList.add("active");
+
+    let actionContainer = document.getElementById("arena-action-group");
+    if (!actionContainer) {
+        actionContainer = document.createElement("div");
+        actionContainer.id = "arena-action-group";
+        detailZone.insertBefore(actionContainer, loadingArea);
+    }
+    actionContainer.innerHTML = "";
+
+    // Fungsi internal untuk menyegarkan info slot mini di dalam detail-zone secara real-time
+    function perbaruiIndikatorMini() {
+        const p1Skrg = JSON.parse(localStorage.getItem("p1_battle"));
+        const p2Skrg = JSON.parse(localStorage.getItem("p2_battle"));
+        
+        const slotP1 = document.getElementById("status-slot-p1");
+        const slotP2 = document.getElementById("status-slot-p2");
+        
+        if (slotP1) slotP1.innerText = p1Skrg ? `🔴 P1: ${p1Skrg.name} (${p1Skrg.form_name})` : "🔴 P1: Belum Memilih";
+        if (slotP2) slotP2.innerText = p2Skrg ? `🟢 P2: ${p2Skrg.name} (${p2Skrg.form_name})` : "🟢 P2: Belum Memilih";
     }
 
-    loadingArea.style.display = "block";
-    arenaDisplay.style.display = "none";
-    previewDisplay.style.display = "none"; 
-    toggleButtons(true);
-    resetBars();
+    char.forms.forEach((form, index) => {
+        const btn = document.createElement("button");
+        btn.className = "btn-form-opt";
+        btn.innerText = form.form_name;
 
-    // Otomatis digabung rapi untuk dikirim ke API Groq
-    const finalChar1 = `${name1} dari seri ${origin1}`;
-    const finalChar2 = `${name2} dari seri ${origin2}`;
+        btn.addEventListener("click", () => {
+            document.querySelectorAll('.btn-form-opt').forEach(b => b.classList.remove('active-p1'));
+            btn.classList.add('active-p1');
+            jalankanRisetForm(char, form);
+
+            // Susun ulang struktur tombol aksi & indikator mini
+            actionContainer.innerHTML = `
+                <div style="display: flex; justify-content: space-around; width: 100%; margin-bottom: 10px; font-size: 13px; font-weight: bold;">
+                    <span id="status-slot-p1" style="color: #ff0055; background: #222; padding: 4px 10px; border-radius: 4px; border: 1px solid #ff0055;">🔴 P1: Memuat...</span>
+                    <span id="status-slot-p2" style="color: #00ff55; background: #222; padding: 4px 10px; border-radius: 4px; border: 1px solid #00ff55;">🟢 P2: Memuat...</span>
+                </div>
+                
+                <button class="btn-page" style="background:#ff0055;" id="set-p1">Set P1 🔴</button>
+                <button class="btn-page" style="background:#00ff55;" id="set-p2">Set P2 🟢</button>
+            `;
+
+            // Panggil pengisian teks indikator mini sesaat setelah HTML diinjeksikan
+            perbaruiIndikatorMini();
+
+            // Logika Klik Set P1
+            document.getElementById("set-p1").onclick = () => {
+                localStorage.setItem("p1_battle", JSON.stringify({...char, ...form}));
+                perbaruiIndikatorMini();   // Ganti teks indikator mini bawah secara instan
+                perbaruiIndikatorGlobal(); // Ganti teks indikator global atas secara instan
+                alert(`${char.name} (${form.form_name}) diset sebagai P1!`);
+            };
+
+            // Logika Klik Set P2
+            document.getElementById("set-p2").onclick = () => {
+                localStorage.setItem("p2_battle", JSON.stringify({...char, ...form}));
+                perbaruiIndikatorMini();   // Ganti teks indikator mini bawah secara instan
+                perbaruiIndikatorGlobal(); // Ganti teks indikator global atas secara instan
+                alert(`${char.name} (${form.form_name}) diset sebagai P2!`);
+            };
+        });
+
+        formOptionsContainer.appendChild(btn);
+        if (index === 0) btn.click();
+    });
+}
+
+// --- 5. RISET AI ---
+async function jalankanRisetForm(char, form) {
+    loadingArea.style.display = "block";
+    researchResult.style.display = "none";
 
     try {
-        const response = await fetch('/api/deathbattle', {
+        const res = await fetch('/api/research', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ karakter1: finalChar1, karakter2: finalChar2 })
+            body: JSON.stringify({ name: char.name, origin: char.origin, form_name: form.form_name })
         });
-        
-        const data = await response.json();
-        
-        document.getElementById("name-f1").innerText = data.f1.name;
-        document.getElementById("origin-f1").innerText = `Asal: ${data.f1.origin}`;
-        document.getElementById("tier-f1").innerText = data.f1.tier;
-        document.getElementById("desc-f1").innerText = data.f1.desc;
-        document.getElementById("ability-f1").innerText = data.f1.ability;
+        const data = await res.json();
 
-        document.getElementById("name-f2").innerText = data.f2.name;
-        document.getElementById("origin-f2").innerText = `Asal: ${data.f2.origin}`;
-        document.getElementById("tier-f2").innerText = data.f2.tier;
-        document.getElementById("desc-f2").innerText = data.f2.desc;
-        document.getElementById("ability-f2").innerText = data.f2.ability;
+        // Update Gambar & Info Utama
+        charFormImg.src = form.image_url ? `/images/${form.image_url}` : 'https://placehold.co/150';
+        resFormName.innerText = `${char.name} (${form.form_name})`;
+        resFormTier.innerText = `Tier: ${data.tier}`;
+        resFormAbility.innerText = `Ability: ${data.ability}`;
+        resFormDesc.innerText = data.desc;
 
-        document.getElementById("battle-winner").innerText = data.winner;
-        document.getElementById("battle-reason").innerText = data.reason;
+        // --- GENERATE GRAPHIC BAR CHART DENGAN KLASIFIKASI TEXT ---
+        if (resStatsContainer) {
+            resStatsContainer.innerHTML = `
+                <div style="display: grid; grid-template-columns: 1fr; gap: 8px; margin: 15px 0;">
+                    ${buatStatBar("💪 Strength", data.str, "Strength")}
+                    ${buatStatBar("⚡ Speed", data.spd, "Speed")}
+                    ${buatStatBar("🛡️ Durability", data.dur, "Durability")}
+                    ${buatStatBar("🧠 Intelligence", data.iq, "Intelligence")}
+                    ${buatStatBar("🔮 Powers / Hax", data.pwr, "Powers")}
+                    ${buatStatBar("🔋 Stamina", data.stam, "Stamina")}
+                </div>
+            `;
+        } else {
+            console.warn("Elemen #res-stats tidak ditemukan di HTML!");
+        }
 
-        const stats = ["str", "spd", "dur", "iq", "pwr", "stam"];
-        stats.forEach(stat => {
-            const valF1 = data.f1[stat];
-            const valF2 = data.f2[stat];
-
-            const tierF1 = (stat === "spd") ? getSpeedTier(valF1) : getGeneralPowerTier(valF1);
-            const tierF2 = (stat === "spd") ? getSpeedTier(valF2) : getGeneralPowerTier(valF2);
-
-            if(document.getElementById(`bar-${stat}-f1`)) document.getElementById(`bar-${stat}-f1`).style.width = `${valF1}%`;
-            if(document.getElementById(`val-${stat}-f1`)) document.getElementById(`val-${stat}-f1`).innerText = tierF1;
-            
-            if(document.getElementById(`bar-${stat}-f2`)) document.getElementById(`bar-${stat}-f2`).style.width = `${valF2}%`;
-            if(document.getElementById(`val-${stat}-f2`)) document.getElementById(`val-${stat}-f2`).innerText = tierF2;
-        });
-
-        arenaDisplay.style.display = "flex";
-        if (typeof confetti === "function") confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 } });
-
-    } catch (error) {
-        alert("Gagal memproses analisis pertarungan!");
+        researchResult.style.display = "flex";
+    } catch (err) {
+        console.error(err);
+        alert("Gagal meriset data!");
     } finally {
         loadingArea.style.display = "none";
-        toggleButtons(false);
-    }
-});
-
-// --- 2. PROSES CEK DATA SINGLE ---
-checkF1Btn.addEventListener("click", () => {
-    const name = p1Nama.value.trim();
-    const origin = p1Asal.value.trim();
-    if (!name || !origin) return alert("Isi Nama dan Asal Anime Petarung 1 dulu!");
-    checkCharacterData(`${name} dari seri ${origin}`);
-});
-
-checkF2Btn.addEventListener("click", () => {
-    const name = p2Nama.value.trim();
-    const origin = p2Asal.value.trim();
-    if (!name || !origin) return alert("Isi Nama dan Asal Anime Petarung 2 dulu!");
-    checkCharacterData(`${name} dari seri ${origin}`);
-});
-
-async function checkCharacterData(charFullInput) {
-    loadingArea.style.display = "block";
-    arenaDisplay.style.display = "none"; 
-    previewDisplay.style.display = "none";
-    toggleButtons(true);
-    resetBars();
-
-    try {
-        const response = await fetch('/api/checkcharacter', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ karakter: charFullInput })
-        });
-
-        const data = await response.json();
-        
-        document.getElementById("prev-name").innerText = data.name;
-        document.getElementById("prev-origin").innerText = `Asal: ${data.origin}`;
-        document.getElementById("prev-tier").innerText = data.tier;
-        document.getElementById("prev-desc").innerText = data.desc;
-        document.getElementById("prev-ability").innerText = data.ability;
-        
-        const stats = ["str", "spd", "dur", "iq", "pwr", "stam"];
-        stats.forEach(stat => {
-            const val = data[stat];
-            const barEl = document.getElementById(`bar-${stat}-prev`);
-            const valEl = document.getElementById(`val-${stat}-prev`);
-            
-            const tierText = (stat === "spd") ? getSpeedTier(val) : getGeneralPowerTier(val);
-
-            if (barEl) barEl.style.width = `${val}%`;
-            if (valEl) valEl.innerText = tierText;
-        });
-
-        previewDisplay.style.display = "block";
-
-    } catch (error) {
-        alert("Gagal mengecek data karakter!");
-    } finally {
-        loadingArea.style.display = "none";
-        toggleButtons(false);
     }
 }
+
+// --- JALANKAN INI UNTUK MEMPERBARUI INDIKATOR GLOBAL SAAT HALAMAN DIBUKA ---
+function perbaruiIndikatorGlobal() {
+    const p1 = JSON.parse(localStorage.getItem("p1_battle"));
+    const p2 = JSON.parse(localStorage.getItem("p2_battle"));
+
+    const elP1 = document.getElementById("global-status-p1");
+    const elP2 = document.getElementById("global-status-p2");
+
+    if (elP1) {
+        elP1.innerText = p1 ? `🔴 P1: ${p1.name} (${p1.form_name})` : "🔴 P1: Kosong";
+    }
+    if (elP2) {
+        elP2.innerText = p2 ? `🟢 P2: ${p2.name} (${p2.form_name})` : "🟢 P2: Kosong";
+    }
+}
+
+// Inisialisasi awal saat halaman dibuka
+loadCharacters();
+perbaruiIndikatorGlobal();
