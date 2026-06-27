@@ -35,45 +35,62 @@
             Memproses Analisis Form Spesifik dari VS Battles Wiki...
         </div>
 
-        <div class="arena-box" id="arena-result" style="display: none;">
+        <div class="battle-arena-container" id="arena-result" style="display: none;">
             
-            <!-- === DISPLAY PETARUNG 1 === -->
-            <div class="fighter-display">
-                <img src="" id="f1-img" class="arena-avatar p1-border" alt="P1">
-                <div style="width: 100%; text-align: left;">
+            <div class="fighter-column p1-column">
+                <div class="card-fighter">
                     <h3 id="f1-name">Name 1</h3>
                     <div class="tier-text" id="f1-tier">Tier</div>
                     
-                    <!-- PERBAIKAN: Wadah grafik bar stat untuk Petarung 1 -->
-                    <div id="f1-stats" style="margin: 15px 0;"></div>
+                    <div class="avatar-wrapper">
+                        <img src="" id="f1-img" class="arena-avatar p1-border" alt="P1">
+                    </div>
                     
-                    <p id="f1-desc" style="white-space: pre-line; background: #1f2833; padding: 10px; border-radius: 6px; border-left: 3px solid #ff0055;"></p>
+                    <div id="f1-stats"></div>
+                    
+                    <div class="desc-box-side">
+                        <h4>Kondisi & Profil:</h4>
+                        <p id="f1-desc"></p>
+                    </div>
                 </div>
             </div>
 
-            <!-- === DISPLAY PETARUNG 2 === -->
-            <div class="fighter-display">
-                <img src="" id="f2-img" class="arena-avatar p2-border" alt="P2">
-                <div style="width: 100%; text-align: left;">
+            <div class="analysis-column">
+                <div class="versus-title">VS</div>
+                
+                <div class="result-center-box">
+                    <div class="winner-announcement">
+                        <h3>HASIL AKHIR</h3>
+                        <strong id="battle-winner">JUARA: ?</strong>
+                    </div>
+                    
+                    <div class="reason-box">
+                        <h4>Analisis Taktis AI:</h4>
+                        <p id="battle-reason"></p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="fighter-column p2-column">
+                <div class="card-fighter">
                     <h3 id="f2-name">Name 2</h3>
                     <div class="tier-text" id="f2-tier">Tier</div>
                     
-                    <!-- PERBAIKAN: Wadah grafik bar stat untuk Petarung 2 -->
-                    <div id="f2-stats" style="margin: 15px 0;"></div>
+                    <div class="avatar-wrapper">
+                        <img src="" id="f2-img" class="arena-avatar p2-border" alt="P2">
+                    </div>
                     
-                    <p id="f2-desc" style="white-space: pre-line; background: #1f2833; padding: 10px; border-radius: 6px; border-left: 3px solid #00ff55;"></p>
+                    <div id="f2-stats"></div>
+                    
+                    <div class="desc-box-side">
+                        <h4>Kondisi & Profil:</h4>
+                        <p id="f2-desc"></p>
+                    </div>
                 </div>
             </div>
-            
-            <!-- === KOTAK ALASAN / HASIL === -->
-            <div class="reason-box" style="width: 100%; margin-top: 20px; text-align: left;">
-                <strong id="battle-winner" style="font-size: 18px; color: #ffcc00; display: block; margin-bottom: 8px;">JUARA: ?</strong>
-                <p id="battle-reason" style="background: #111; padding: 15px; border-radius: 6px; border: 1px solid #333; line-height: 1.6;"></p>
-            </div>
-        </div>
-    </div>
 
-    <!-- PANGGIL SCRIPT EKSTERNAL DI SINI -->
+        </div> </div>
+
     <script src="battle.js"></script>
 </body>
 </html>
