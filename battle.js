@@ -32,66 +32,63 @@ function createBattleStatBar(label, value, color) {
     `;
 }
 
-// 2. Fungsi proses mengirim data duel ke API Backend
-async function prosesDuel() {
-    loadEl.style.display = "block";
-    arenaEl.style.display = "none";
-    if (btnAction) btnAction.disabled = true;
+// Pastikan variabel data karakter 1 dan 2 yang sudah di-research disimpan secara global/bisa diakses di sini
+// Misal namanya: petarung1Data dan petarung2Data (sesuaikan dengan nama variabelmu)
 
+async function prosesDuel() {
     try {
+        // 1. Validasi dulu sebelum kirim ke server, biar gak bikin server crash
+        if (!petarung1Data || !petarung2Data) {
+            alert("Kedua karakter harus disiapkan/diriset terlebih dahulu!");
+            return;
+        }
+
+        // Tampilkan loading screen/text kamu di sini
+        document.getElementById('loading').style.display = 'block';
+
+        // 2. Kirim payload LENGKAP hasil riset ke server.js
         const response = await fetch('/api/deathbattle', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ p1: selectedP1, p2: selectedP2 })
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                p1: petarung1Data, // Bungkus dalam properti 'p1' sesuai request server.js
+                p2: petarung2Data  // Bungkus dalam properti 'p2' sesuai request server.js
+            })
         });
-        
+
         const data = await response.json();
 
-        // Tampilkan gambar form masing-masing
-        document.getElementById("f1-img").src = selectedP1.image_url ? `/images/${selectedP1.image_url}` : 'https://placehold.co/150';
-        document.getElementById("f2-img").src = selectedP2.image_url ? `/images/${selectedP2.image_url}` : 'https://placehold.co/150';
+        if (!response.ok) {
+            throw new Error(data.error || "Gagal memproses duel.");
+        }
 
-        // --- DATA PETARUNG 1 (🔴 MERAH) ---
-        document.getElementById("f1-name").innerText = `${data.f1.name} (${selectedP1.form_name})`;
-        document.getElementById("f1-tier").innerText = `Tier: ${data.f1.tier}`;
-        document.getElementById("f1-desc").innerText = `Hax & Skill:\n${data.f1.ability}\n\nFisik:\n${data.f1.desc}`;
-        
-        // Render 6 Bar Stat untuk P1
-        document.getElementById("f1-stats").innerHTML = `
-            ${createBattleStatBar("💪 STR (Strength)", data.f1.str, "linear-gradient(90deg, #ff0055, #ff5500)")}
-            ${createBattleStatBar("⚡ SPD (Speed)", data.f1.spd, "linear-gradient(90deg, #ff0055, #ff5500)")}
-            ${createBattleStatBar("🛡️ DUR (Durability)", data.f1.dur, "linear-gradient(90deg, #ff0055, #ff5500)")}
-            ${createBattleStatBar("🧠 IQ (Intelligence)", data.f1.iq, "linear-gradient(90deg, #ff0055, #ff5500)")}
-            ${createBattleStatBar("🔮 PWR (Powers/Hax)", data.f1.pwr, "linear-gradient(90deg, #ff0055, #ff5500)")}
-            ${createBattleStatBar("🔋 STAM (Stamina)", data.f1.stam, "linear-gradient(90deg, #ff0055, #ff5500)")}
-        `;
+        // 3. Render hasilnya ke dalam layout 3 kolom kamu
+        document.getElementById('battle-winner').textContent = data.winner;
+        document.getElementById('battle-reason').textContent = data.reason;
 
-        // --- DATA PETARUNG 2 (🟢 HIJAU) ---
-        document.getElementById("f2-name").innerText = `${data.f2.name} (${selectedP2.form_name})`;
-        document.getElementById("f2-tier").innerText = `Tier: ${data.f2.tier}`;
-        document.getElementById("f2-desc").innerText = `Hax & Skill:\n${data.f2.ability}\n\nFisik:\n${data.f2.desc}`;
-        
-        // Render 6 Bar Stat untuk P2
-        document.getElementById("f2-stats").innerHTML = `
-            ${createBattleStatBar("💪 STR (Strength)", data.f2.str, "linear-gradient(90deg, #00ff55, #00aaff)")}
-            ${createBattleStatBar("⚡ SPD (Speed)", data.f2.spd, "linear-gradient(90deg, #00ff55, #00aaff)")}
-            ${createBattleStatBar("🛡️ DUR (Durability)", data.f2.dur, "linear-gradient(90deg, #00ff55, #00aaff)")}
-            ${createBattleStatBar("🧠 IQ (Intelligence)", data.f2.iq, "linear-gradient(90deg, #00ff55, #00aaff)")}
-            ${createBattleStatBar("🔮 PWR (Powers/Hax)", data.f2.pwr, "linear-gradient(90deg, #00ff55, #00aaff)")}
-            ${createBattleStatBar("🔋 STAM (Stamina)", data.f2.stam, "linear-gradient(90deg, #00ff55, #00aaff)")}
-        `;
+        // Update Stat Bar P1 secara dinamis (sesuaikan ID dengan HTML kamu)
+        document.getElementById('p1-str-bar').style.width = `${data.f1.str}%`;
+        document.getElementById('p1-spd-bar').style.width = `${data.f1.spd}%`;
+        document.getElementById('p1-dur-bar').style.width = `${data.f1.dur}%`;
+        document.getElementById('p1-iq-bar').style.width = `${data.f1.iq}%`;
+        document.getElementById('p1-pwr-bar').style.width = `${data.f1.pwr}%`;
+        document.getElementById('p1-stam-bar').style.width = `${data.f1.stam}%`;
 
-        // Hasil Akhir Penilaian Juri AI
-        document.getElementById("battle-winner").innerText = `🏆 WINNER: ${data.winner}`;
-        document.getElementById("battle-reason").innerText = data.reason;
+        // Update Stat Bar P2 secara dinamis
+        document.getElementById('p2-str-bar').style.width = `${data.f2.str}%`;
+        document.getElementById('p2-spd-bar').style.width = `${data.f2.spd}%`;
+        document.getElementById('p2-dur-bar').style.width = `${data.f2.dur}%`;
+        document.getElementById('p2-iq-bar').style.width = `${data.f2.iq}%`;
+        document.getElementById('p2-pwr-bar').style.width = `${data.f2.pwr}%`;
+        document.getElementById('p2-stam-bar').style.width = `${data.f2.stam}%`;
 
-        arenaEl.style.display = "flex";
-    } catch (err) {
-        console.error(err);
-        alert("Error saat memproses duel AI!");
+    } catch (error) {
+        console.error("Error saat duel:", error);
+        alert("Terjadi kesalahan: " + error.message);
     } finally {
-        loadEl.style.display = "none";
-        if (btnAction) btnAction.disabled = false;
+        document.getElementById('loading').style.display = 'none';
     }
 }
 
