@@ -17,22 +17,28 @@
     app.use(express.json());
     app.use(express.static(__dirname));
 
-    const dbConfig = {
-        host: process.env.MYSQLHOST || process.env.DB_HOST,
-        user: process.env.MYSQLUSER || process.env.DB_USER,
-        password: process.env.MYSQLPASSWORD || process.env.DB_PASSWORD,
-        database: process.env.MYSQLDATABASE || process.env.DB_NAME,
-        port: parseInt(process.env.MYSQLPORT || process.env.DB_PORT),
-        ssl: { rejectUnauthorized: false }
+    const dbConfig = process.env.MYSQL_URL || {
+        host: process.env.DB_HOST || 'localhost',
+        user: process.env.DB_USER || 'root',
+        password: process.env.DB_PASSWORD || '',
+        database: process.env.DB_NAME || 'DB_anime',
+        port: parseInt(process.env.DB_PORT || '3306'),
+        ssl: process.env.MYSQL_URL ? { rejectUnauthorized: false } : false // Hanya pakai SSL kalau di cloud
     };
 
     const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
-    // --- API 1: AMBIL DATA KARAKTER + FORM (JOIN DENGAN FOTO UTAMA KARAKTER) ---
+    // --- API 1: AMBIL DATA KARAKTER ---
     app.get('/api/characters', async (req, res) => {
+        let connection;
         try {
-            const connection = await mysql.createConnection(dbConfig);
-            // Memperbarui query untuk menarik c.image_url dari tabel characters
+            // Cek apakah dbConfig berbentuk String (URL) atau Object (Local)
+            if (typeof dbConfig === 'string') {
+                connection = await mysql.createConnection(dbConfig);
+            } else {
+                connection = await mysql.createConnection(dbConfig);
+            }
+
             const [rows] = await connection.query(`
                 SELECT 
                     c.id AS char_id, 
@@ -45,14 +51,15 @@
                 FROM characters c
                 JOIN char_forms f ON c.id = f.character_id
             `);
+            
             await connection.end();
             res.json(rows);
         } catch (err) {
-            console.error("Database Error:", err);
-            res.status(500).json({ error: "Gagal memuat data dari database Railway." });
+            console.error("Database Error Detail:", err); // Ini akan memunculkan detail error asli di log Railway
+            if (connection) await connection.end();
+            res.status(500).json({ error: "Gagal memuat data dari database Railway.", rincian: err.message });
         }
     });
-
     // --- API 2: UPGRADE PROMPT RISET FORM (DENGAN SKALA STAT 0-100) ---
     app.post('/api/research', async (req, res) => {
         const { name, origin, form_name } = req.body;
