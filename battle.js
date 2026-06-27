@@ -8,7 +8,7 @@ const btnAction = document.getElementById("btn-action");
 const loadEl = document.getElementById("loading");
 const arenaEl = document.getElementById("arena-result");
 
-// VARIABEL GLOBAL: Tempat menampung data riset mendalam dari AI /api/research
+// VARIABEL GLOBAL: Menampung data gabungan identitas + hasil /api/research
 let petarung1Data = null;
 let petarung2Data = null;
 
@@ -20,7 +20,7 @@ if (!selectedP1 || !selectedP2) {
     if (statusP1) statusP1.innerText = `${selectedP1.name} (${selectedP1.form_name})`;
     if (statusP2) statusP2.innerText = `${selectedP2.name} (${selectedP2.form_name})`;
     
-    // LANGKAH OTOMATIS: Begitu halaman kebuka, langsung riset data detail kedua karakter ke AI
+    // LANGKAH OTOMATIS: Begitu halaman dibuka, langsung riset detail karakteristik ke AI
     siapkanDataPertarungan();
 }
 
@@ -28,9 +28,8 @@ if (!selectedP1 || !selectedP2) {
 async function siapkanDataPertarungan() {
     try {
         if (loadEl) loadEl.style.display = 'block';
-        if (btnAction) btnAction.disabled = true; // Kunci tombol duel saat riset belum beres
+        if (btnAction) btnAction.disabled = true; // Kunci tombol duel sebelum riset selesai
 
-        // Riset karakter 1 dan karakter 2 secara bersamaan (paralel) biar cepat
         const [resP1, resP2] = await Promise.all([
             fetch('/api/research', {
                 method: 'POST',
@@ -51,22 +50,20 @@ async function siapkanDataPertarungan() {
         petarung1Data = { ...selectedP1, ...detailP1 };
         petarung2Data = { ...selectedP2, ...detailP2 };
 
-        console.log("Riset Beres! Data Siap Diadu:", { petarung1Data, petarung2Data });
+        console.log("Riset Karakter Selesai! Siap Diadu:", { petarung1Data, petarung2Data });
 
-        // Tampilkan informasi berkas kemampuan awal di kolom samping jika ada elemennya
-        if (document.getElementById('p1-ability')) document.getElementById('p1-ability').textContent = petarung1Data.ability;
-        if (document.getElementById('p2-ability')) document.getElementById('p2-ability').textContent = petarung2Data.ability;
+        // Tampilkan info profil karakter ke UI kolom samping kiri-kanan secara aman
+        renderProfilAwal();
 
         if (btnAction) btnAction.disabled = false; // Buka kunci tombol duel
     } catch (error) {
         console.error("Gagal menyiapkan data riset karakter:", error);
-        alert("Gagal meriset karakteristik karakter dari server.");
     } finally {
         if (loadEl) loadEl.style.display = 'none';
     }
 }
 
-// Fungsi pembantu untuk membuat Bar Statistik Game otomatis (bisa kamu pakai jika diperlukan)
+// Fungsi pembantu untuk mencetak komponen HTML Bar Statistik Game secara dinamis
 function createBattleStatBar(label, value, color) {
     return `
         <div style="background: #1a1a1a; padding: 6px; border-radius: 4px; margin-bottom: 8px;">
@@ -81,27 +78,62 @@ function createBattleStatBar(label, value, color) {
     `;
 }
 
+// Merender Profil dan Stat Bar Riset awal ke UI sebelum bertarung
+function renderProfilAwal() {
+    if (!petarung1Data || !petarung2Data) return;
+
+    // Player 1 Side
+    if (document.getElementById('f1-name')) document.getElementById('f1-name').innerText = petarung1Data.name;
+    if (document.getElementById('f1-tier')) document.getElementById('f1-tier').innerText = `Form: ${petarung1Data.form_name} | ${petarung1Data.tier}`;
+    if (document.getElementById('f1-img') && petarung1Data.form_image) document.getElementById('f1-img').src = petarung1Data.form_image;
+    if (document.getElementById('f1-desc')) document.getElementById('f1-desc').innerHTML = `<strong>Hax:</strong> ${petarung1Data.ability}<br><br>${petarung1Data.desc}`;
+    
+    const statsContainer1 = document.getElementById('f1-stats');
+    if (statsContainer1) {
+        statsContainer1.innerHTML = `
+            ${createBattleStatBar("💪 Strength", petarung1Data.str, "#ff0055")}
+            ${createBattleStatBar("⚡ Speed", petarung1Data.spd, "#ff0055")}
+            ${createBattleStatBar("🛡️ Durability", petarung1Data.dur, "#ff0055")}
+            ${createBattleStatBar("🧠 Intelligence", petarung1Data.iq, "#ff0055")}
+            ${createBattleStatBar("🔮 Powers / Hax", petarung1Data.pwr, "#ff0055")}
+            ${createBattleStatBar("🔋 Stamina", petarung1Data.stam, "#ff0055")}
+        `;
+    }
+
+    // Player 2 Side
+    if (document.getElementById('f2-name')) document.getElementById('f2-name').innerText = petarung2Data.name;
+    if (document.getElementById('f2-tier')) document.getElementById('f2-tier').innerText = `Form: ${petarung2Data.form_name} | ${petarung2Data.tier}`;
+    if (document.getElementById('f2-img') && petarung2Data.form_image) document.getElementById('f2-img').src = petarung2Data.form_image;
+    if (document.getElementById('f2-desc')) document.getElementById('f2-desc').innerHTML = `<strong>Hax:</strong> ${petarung2Data.ability}<br><br>${petarung2Data.desc}`;
+
+    const statsContainer2 = document.getElementById('f2-stats');
+    if (statsContainer2) {
+        statsContainer2.innerHTML = `
+            ${createBattleStatBar("💪 Strength", petarung2Data.str, "#00ff55")}
+            ${createBattleStatBar("⚡ Speed", petarung2Data.spd, "#00ff55")}
+            ${createBattleStatBar("🛡️ Durability", petarung2Data.dur, "#00ff55")}
+            ${createBattleStatBar("🧠 Intelligence", petarung2Data.iq, "#00ff55")}
+            ${createBattleStatBar("🔮 Powers / Hax", petarung2Data.pwr, "#00ff55")}
+            ${createBattleStatBar("🔋 Stamina", petarung2Data.stam, "#00ff55")}
+        `;
+    }
+}
+
 // Fungsi Utama: Memproses Simulasi Duel Juri AI Profesional
 async function prosesDuel() {
     try {
-        // 1. Validasi pengaman agar data tidak kosong saat dilempar ke backend
         if (!petarung1Data || !petarung2Data) {
-            alert("Data karakteristik karakter belum selesai dimuat. Tunggu sebentar!");
+            alert("Data karakteristik karakter sedang dimuat. Tunggu sebentar!");
             return;
         }
 
         if (loadEl) loadEl.style.display = 'block';
 
-        // 2. Kirim payload LENGKAP hasil riset ke server.js untuk dinilai objektif oleh juri AI
+        // Kirim payload LENGKAP hasil riset ke server.js untuk dinilai objektif oleh juri AI
         const response = await fetch('/api/deathbattle', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                p1: petarung1Data, 
-                p2: petarung2Data  
-            })
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ p1: petarung1Data, p2: petarung2Data })
         });
 
         const data = await response.json();
@@ -110,28 +142,37 @@ async function prosesDuel() {
             throw new Error(data.error || "Gagal memproses duel.");
         }
 
-        // 3. Render hasilnya ke dalam layout 3 kolom bagian tengah
-        if (document.getElementById('battle-winner')) document.getElementById('battle-winner').textContent = data.winner;
+        // Render hasil ulasan juri ke layout bagian tengah
+        if (document.getElementById('battle-winner')) document.getElementById('battle-winner').innerHTML = `<span style='color: #ffc107;'>JUARA:</span> ${data.winner}`;
         if (document.getElementById('battle-reason')) document.getElementById('battle-reason').textContent = data.reason;
 
-        // Update Stat Bar P1 secara dinamis mengikuti hasil penilaian juri AI
-        if (document.getElementById('p1-str-bar')) document.getElementById('p1-str-bar').style.width = `${data.f1.str}%`;
-        if (document.getElementById('p1-spd-bar')) document.getElementById('p1-spd-bar').style.width = `${data.f1.spd}%`;
-        if (document.getElementById('p1-dur-bar')) document.getElementById('p1-dur-bar').style.width = `${data.f1.dur}%`;
-        if (document.getElementById('p1-iq-bar')) document.getElementById('p1-iq-bar').style.width = `${data.f1.iq}%`;
-        if (document.getElementById('p1-pwr-bar')) document.getElementById('p1-pwr-bar').style.width = `${data.f1.pwr}%`;
-        if (document.getElementById('p1-stam-bar')) document.getElementById('p1-stam-bar').style.width = `${data.f1.stam}%`;
+        // Gambar ulang Stat Bar kedua belah pihak pasca-tanding mengikuti penilaian juri AI
+        const statsContainer1 = document.getElementById('f1-stats');
+        if (statsContainer1 && data.f1) {
+            statsContainer1.innerHTML = `
+                ${createBattleStatBar("💪 Strength", data.f1.str, "#ff0055")}
+                ${createBattleStatBar("⚡ Speed", data.f1.spd, "#ff0055")}
+                ${createBattleStatBar("🛡️ Durability", data.f1.dur, "#ff0055")}
+                ${createBattleStatBar("🧠 Intelligence", data.f1.iq, "#ff0055")}
+                ${createBattleStatBar("🔮 Powers / Hax", data.f1.pwr, "#ff0055")}
+                ${createBattleStatBar("🔋 Stamina", data.f1.stam, "#ff0055")}
+            `;
+        }
 
-        // Update Stat Bar P2 secara dinamis
-        if (document.getElementById('p2-str-bar')) document.getElementById('p2-str-bar').style.width = `${data.f2.str}%`;
-        if (document.getElementById('p2-spd-bar')) document.getElementById('p2-spd-bar').style.width = `${data.f2.spd}%`;
-        if (document.getElementById('p2-dur-bar')) document.getElementById('p2-dur-bar').style.width = `${data.f2.dur}%`;
-        if (document.getElementById('p2-iq-bar')) document.getElementById('p2-iq-bar').style.width = `${data.f2.iq}%`;
-        if (document.getElementById('p2-pwr-bar')) document.getElementById('p2-pwr-bar').style.width = `${data.f2.pwr}%`;
-        if (document.getElementById('p2-stam-bar')) document.getElementById('p2-stam-bar').style.width = `${data.f2.stam}%`;
+        const statsContainer2 = document.getElementById('f2-stats');
+        if (statsContainer2 && data.f2) {
+            statsContainer2.innerHTML = `
+                ${createBattleStatBar("💪 Strength", data.f2.str, "#00ff55")}
+                ${createBattleStatBar("⚡ Speed", data.f2.spd, "#00ff55")}
+                ${createBattleStatBar("🛡️ Durability", data.f2.dur, "#00ff55")}
+                ${createBattleStatBar("🧠 Intelligence", data.f2.iq, "#00ff55")}
+                ${createBattleStatBar("🔮 Powers / Hax", data.f2.pwr, "#00ff55")}
+                ${createBattleStatBar("🔋 Stamina", data.f2.stam, "#00ff55")}
+            `;
+        }
 
-        // Tampilkan area hasil arena pertarungan jika disembunyikan sebelumnya
-        if (arenaEl) arenaEl.style.display = 'block';
+        // Tampilkan container hasil pertempuran secara visual
+        if (arenaEl) arenaEl.style.display = 'flex';
 
     } catch (error) {
         console.error("Error saat duel:", error);
@@ -141,7 +182,7 @@ async function prosesDuel() {
     }
 }
 
-// 3. Pasang event listener ke tombol duel
+// Pasang event listener ke tombol duel
 if (btnAction) {
     btnAction.addEventListener("click", prosesDuel);
 }

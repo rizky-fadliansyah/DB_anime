@@ -1,6 +1,6 @@
 import express from 'express';
 import mysql from 'mysql2/promise';
-import { Groq } from 'groq-sdk';
+import Groq from 'groq-sdk'; // PERBAIKAN: Tanpa kurung kurawal {} agar cocok dengan versi package.json kamu
 import cors from 'cors';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -56,11 +56,11 @@ app.get('/api/characters', async (req, res) => {
     } catch (err) {
         console.error("Database Error Detail:", err);
         if (connection) await connection.end();
-        res.status(500).json({ error: "Gagal memuat data dari database Railway.", rincian: err.message });
+        res.status(500).json({ error: "Gagal memuat data dari database.", rincian: err.message });
     }
 });
 
-// --- API 2: UPGRADE PROMPT RISET FORM (DI-PINGIT SUPAYA RINGKAS & PADAT) ---
+// --- API 2: UPGRADE PROMPT RISET FORM (RINGKAS & PADAT UNTUK TAMPILAN) ---
 app.post('/api/research', async (req, res) => {
     const { name, origin, form_name } = req.body;
 
@@ -104,7 +104,7 @@ app.post('/api/research', async (req, res) => {
         res.json(JSON.parse(chatCompletion.choices[0].message.content));
     } catch (err) {
         console.error("Groq Error:", err);
-        res.status(500).json({ error: "Gagal melakukan riset otomatis via Groq AI." });
+        res.status(500).json({ error: "Gagal melakukan riset otomatis via Groq AI.", rincian: err.message });
     }
 });
 
@@ -119,9 +119,9 @@ app.post('/api/deathbattle', async (req, res) => {
     Kamu WAJIB melakukan analisis berdasarkan data spesifik (Tier, Ability, dan Desc) yang diberikan oleh user di user prompt. Jangan mengarang kemampuan di luar data yang diberikan.
 
     ATURAN KETAT FORMAT & KEPADATAN TEKS:
-    1. Pada bagian "ability", tuliskan MAKSIMAL 3 poin kemampuan/hax paling krusial dipisahkan dengan tanda koma.
-    2. Pada bagian "desc", tuliskan ringkasan kondisi fisik dalam 1 kalimat pendek.
-    3. Pada bagian "reason", tuliskan ANALISIS PROFESIONAL mendalam (sekitar 4-6 kalimat padat). Analisis harus berimbang dengan membedah keunggulan masing-masing karakter terlebih dahulu berdasarkan data yang ada sebelum menyimpulkan faktor krusial penentu kemenangan (seperti efektivitas hax seluler, keunggulan kecepatan untuk speedblitz, atau stamina). Jangan langsung to-the-point tanpa penjelasan logis.
+    1. Pada bagian "ability", tuliskan kembali MAKSIMAL 3-4 poin kemampuan/hax paling krusial dipisahkan dengan tanda koma.
+    2. Pada bagian "desc", tuliskan kembali ringkasan kondisi fisik dalam 1 kalimat pendek.
+    3. Pada bagian "reason", tuliskan ANALISIS PROFESIONAL mendalam (sekitar 4-6 kalimat padat). Analisis harus berimbang dengan membedah keunggulan masing-masing karakter terlebih dahulu berdasarkan data yang ada sebelum menyimpulkan faktor krusial penentu kemenangan (seperti efektivitas hax seluler, keunggulan kecepatan untuk speedblitz, atau stamina). Jangan langsung to-the-point tanpa penjelasan logis, jelaskan pula kondisi apa yang memicu kemenangan tersebut.
 
     Berikan respons wajib dalam format JSON murni terstruktur berikut:
     {
@@ -143,7 +143,6 @@ app.post('/api/deathbattle', async (req, res) => {
     "reason": "Pertarungan ini menyajikan bentrokan yang sangat berimbang di mana [Nama P1] unggul dalam aspek X dan kapasitas stamina, sementara [Nama P2] mendominasi lewat kemampuan Y yang sulit diprediksi. Namun, faktor penentu kemenangan dalam skenario ini bermuara pada kemampuan [Nama Pemenang] untuk mengeksploitasi celah pertahanan lawan lewat [sebutkan faktor/hax/kecepatan]. Dalam kondisi di mana pertempuran berlangsung intens, [Nama Pemenang] mampu mendaratkan serangan fatal yang mengabaikan daya tahan konvensional lawan, sehingga mengunci kemenangan secara logis."
     }`;
 
-    // PERBAIKAN UTAMA: Menyuapi seluruh data berkas riset agar dianalisis secara profesional oleh AI
     const userPrompt = `Simulasikan pertarungan maut secara analitis dan profesional berdasarkan data berkas berikut:
 
     PETARUNG 1:
@@ -177,7 +176,7 @@ app.post('/api/deathbattle', async (req, res) => {
         res.json(JSON.parse(chatCompletion.choices[0].message.content));
     } catch (err) {
         console.error("Groq Battle Error:", err);
-        res.status(500).json({ error: "Gagal memproses simulasi pertarungan maut via Groq AI." });
+        res.status(500).json({ error: "Gagal memproses simulasi pertarungan maut via Groq AI.", rincian: err.message });
     }
 });
 
