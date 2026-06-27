@@ -130,14 +130,19 @@ app.post('/api/deathbattle', async (req, res) => {
     ATURAN KETAT FORMAT & KEPADATAN TEKS:
     1. Pada bagian "ability", tuliskan kembali MAKSIMAL 3-4 poin kemampuan/hax paling krusial dipisahkan dengan tanda koma.
     2. Pada bagian "desc", tuliskan kembali ringkasan kondisi fisik dalam 1 kalimat pendek.
-    3. Pada bagian "reason", tuliskan ANALISIS PROFESIONAL mendalam (sekitar 4-6 kalimat padat). Analisis harus berimbang dengan membedah keunggulan masing-masing karakter terlebih dahulu sebelum menyimpulkan faktor krusial penentu kemenangan.
-
+    3. Pada bagian "reason", berikan ANALISIS PROFESIONAL METODOLOGIS DAN SANGAT DETAIL (MINIMAL 8 KALIMAT, MAKSIMAL 15 KALIMAT). 
+       Analisis dalam "reason" WAJIB membedah komponen berikut secara runut:
+       - Bandingkan perbedaan mutlak antar Tier kekuatan (Attack Potency/Daya Hancur) dan Durability kedua karakter.
+       - Bedah perbandingan kecepatan (Speed) operasional maupun refleks pertarungan.
+       - Analisis efektivitas taktis berdasarkan Kecerdasan Bertarung (Battle IQ/IQ) serta Stamina masing-masing dalam skenario jangka panjang.
+       - Evaluasi bentrokan Powers/Hax (apakah kemampuan khusus Karakter A bisa dikaunter oleh resistensi Karakter B, atau sebaliknya).
+       - Simpulkan faktor krusial (Decisive Factor) yang paling masuk akal yang menjadi penentu mutlak kemenangan salah satu pihak tanpa menggunakan kalimat klise seperti "pertarungan ini sangat sengit". Gunakan bahasa formal bahasa Indonesia yang baku dan berwibawa.
     Berikan respons wajib dalam format JSON murni terstruktur berikut:
     {
     "f1": { "name": "P1", "tier": "Tier P1", "ability": "A, B", "desc": "Teks", "str": 80, "spd": 80, "dur": 80, "iq": 80, "pwr": 80, "stam": 80 },
     "f2": { "name": "P2", "tier": "Tier P2", "ability": "C, D", "desc": "Teks", "str": 70, "spd": 70, "dur": 70, "iq": 70, "pwr": 70, "stam": 70 },
     "winner": "NAMA PEMENANG",
-    "reason": "Analisis lah seperti analisis profesional sengan se detail-detailnya maksimal 15 kalimat"
+    "reason": "Tuliskan analisis profesional detail Anda di sini (8-15 kalimat padat)..."
     }`;
 
     const userPrompt = `Simulasikan pertarungan maut:\n\nPETARUNG 1:\nNama: ${p1.name}\nTier: ${p1.tier}\nStat Angka: STR:${p1.str}, SPD:${p1.spd}, DUR:${p1.dur}, IQ:${p1.iq}, PWR:${p1.pwr}, STAM:${p1.stam}\n\nPETARUNG 2:\nNama: ${p2.name}\nTier: ${p2.tier}\nStat Angka: STR:${p2.str}, SPD:${p2.spd}, DUR:${p2.dur}, IQ:${p2.iq}, PWR:${p2.pwr}, STAM:${p2.stam}`;
