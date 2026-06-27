@@ -320,3 +320,67 @@ h1 {
     background: linear-gradient(90deg, #ff0055, #00ffff); 
     transition: width 1s ease-in-out; 
 }
+
+/* ==========================================================================
+   PENYELARASAN HALAMAN UTAMA (INDEX.HTML)
+   ========================================================================== */
+
+/* Batasi lebar konten khusus elemen-elemen atas di halaman utama agar tetap fokus di tengah */
+.subtitle, 
+.nav-header, 
+.selection-container, 
+.btn-battle,
+form, 
+.search-bar-container {
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Tombol Masuk ke Battle Arena dibuat proporsional dan tidak selebar layar */
+button[onclick*="window.location.href='battle.html'"],
+.wrapper > button {
+    max-width: 400px;
+    margin: 0 auto 25px auto;
+    display: block;
+}
+
+/* Judul Kategori Karakter */
+h2, .wrapper > h3 {
+    text-align: left;
+    max-width: 1000px;
+    margin: 20px auto;
+}
+
+/* Perbaikan Grid Karakter agar otomatis membagi kolom secara rapi & adil */
+.char-grid { 
+    display: grid; 
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); 
+    gap: 20px; 
+    max-width: 1000px; /* Batasi lebar maksimal grid di halaman utama */
+    margin: 20px auto 0 auto;
+}
+
+/* Atur Gambar Thumbnail Karakter agar ukurannya pas & proporsional (Tidak Gepeng/Melar) */
+.char-thumb { 
+    width: 100%; 
+    height: 180px; /* Set tinggi portrait yang pas */
+    object-fit: cover; 
+    border-radius: 6px; 
+    margin-bottom: 12px; 
+    background: #1b1f27; 
+    display: block;
+}
+
+/* Kembalikan kartu karakter ke bentuk portrait yang rapi */
+.char-card {
+    background: #0f1115;
+    border: 1px solid #333;
+    border-radius: 8px;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 260px;
+}
