@@ -46,13 +46,13 @@ async function siapkanDataPertarungan() {
         const detailP1 = await resP1.json();
         const detailP2 = await resP2.json();
 
-        // Gabungkan info dasar identitas dengan hasil statistik dari AI riset
+        // Gabungkan info dasar identitas dari database dengan hasil riset AI
         petarung1Data = { ...selectedP1, ...detailP1 };
         petarung2Data = { ...selectedP2, ...detailP2 };
 
         console.log("Riset Karakter Selesai! Siap Diadu:", { petarung1Data, petarung2Data });
 
-        // Tampilkan info profil karakter ke UI kolom samping kiri-kanan secara aman
+        // Tampilkan info profil karakter ke UI kolom samping kiri-kanan
         renderProfilAwal();
 
         if (btnAction) btnAction.disabled = false; // Buka kunci tombol duel
@@ -65,14 +65,15 @@ async function siapkanDataPertarungan() {
 
 // Fungsi pembantu untuk mencetak komponen HTML Bar Statistik Game secara dinamis
 function createBattleStatBar(label, value, color) {
+    const safeValue = value !== undefined && value !== null ? value : 50; 
     return `
-        <div style="background: #1a1a1a; padding: 6px; border-radius: 4px; margin-bottom: 8px;">
+        <div style="background: #1a1a1a; padding: 6px; border-radius: 4px; margin-bottom: 8px; text-align: left;">
             <div style="display:flex; justify-content:space-between; font-size:11px; color: #ccc;">
                 <span>${label}</span>
-                <strong>${value}/100</strong>
+                <strong>${safeValue}/100</strong>
             </div>
             <div style="background: #333; height: 8px; width: 100%; border-radius: 4px; margin-top: 4px; overflow: hidden;">
-                <div style="height: 100%; width: ${value}%; background: ${color}; transition: width 0.8s ease-in-out;"></div>
+                <div style="height: 100%; width: ${safeValue}%; background: ${color}; transition: width 0.8s ease-in-out;"></div>
             </div>
         </div>
     `;
@@ -82,11 +83,20 @@ function createBattleStatBar(label, value, color) {
 function renderProfilAwal() {
     if (!petarung1Data || !petarung2Data) return;
 
-    // Player 1 Side
+    // --- PLAYER 1 SIDE ---
     if (document.getElementById('f1-name')) document.getElementById('f1-name').innerText = petarung1Data.name;
-    if (document.getElementById('f1-tier')) document.getElementById('f1-tier').innerText = `Form: ${petarung1Data.form_name} | ${petarung1Data.tier}`;
-    if (document.getElementById('f1-img') && petarung1Data.form_image) document.getElementById('f1-img').src = petarung1Data.form_image;
-    if (document.getElementById('f1-desc')) document.getElementById('f1-desc').innerHTML = `<strong>Hax:</strong> ${petarung1Data.ability}<br><br>${petarung1Data.desc}`;
+    if (document.getElementById('f1-tier')) document.getElementById('f1-tier').innerText = `Form: ${petarung1Data.form_name} | ${petarung1Data.tier || 'Tier Unknown'}`;
+    
+    // PERBAIKAN: Tambahkan prefix folder '/images/' agar jalurnya sesuai dengan penempatan aset di server
+    const imgP1 = document.getElementById('f1-img');
+    if (imgP1) {
+        const fileGambar1 = petarung1Data.image_url || petarung1Data.form_image || petarung1Data.char_image;
+        imgP1.src = fileGambar1 ? `/images/${fileGambar1}` : 'https://placehold.co/150';
+    }
+    
+    if (document.getElementById('f1-desc')) {
+        document.getElementById('f1-desc').innerHTML = `<strong>Hax:</strong> ${petarung1Data.ability || 'Tidak ada'}<br><br>${petarung1Data.desc || ''}`;
+    }
     
     const statsContainer1 = document.getElementById('f1-stats');
     if (statsContainer1) {
@@ -100,11 +110,20 @@ function renderProfilAwal() {
         `;
     }
 
-    // Player 2 Side
+    // --- PLAYER 2 SIDE ---
     if (document.getElementById('f2-name')) document.getElementById('f2-name').innerText = petarung2Data.name;
-    if (document.getElementById('f2-tier')) document.getElementById('f2-tier').innerText = `Form: ${petarung2Data.form_name} | ${petarung2Data.tier}`;
-    if (document.getElementById('f2-img') && petarung2Data.form_image) document.getElementById('f2-img').src = petarung2Data.form_image;
-    if (document.getElementById('f2-desc')) document.getElementById('f2-desc').innerHTML = `<strong>Hax:</strong> ${petarung2Data.ability}<br><br>${petarung2Data.desc}`;
+    if (document.getElementById('f2-tier')) document.getElementById('f2-tier').innerText = `Form: ${petarung2Data.form_name} | ${petarung2Data.tier || 'Tier Unknown'}`;
+    
+    // PERBAIKAN: Tambahkan prefix folder '/images/' agar jalurnya sesuai dengan penempatan aset di server
+    const imgP2 = document.getElementById('f2-img');
+    if (imgP2) {
+        const fileGambar2 = petarung2Data.image_url || petarung2Data.form_image || petarung2Data.char_image;
+        imgP2.src = fileGambar2 ? `/images/${fileGambar2}` : 'https://placehold.co/150';
+    }
+    
+    if (document.getElementById('f2-desc')) {
+        document.getElementById('f2-desc').innerHTML = `<strong>Hax:</strong> ${petarung2Data.ability || 'Tidak ada'}<br><br>${petarung2Data.desc || ''}`;
+    }
 
     const statsContainer2 = document.getElementById('f2-stats');
     if (statsContainer2) {
@@ -129,7 +148,6 @@ async function prosesDuel() {
 
         if (loadEl) loadEl.style.display = 'block';
 
-        // Kirim payload LENGKAP hasil riset ke server.js untuk dinilai objektif oleh juri AI
         const response = await fetch('/api/deathbattle', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -142,11 +160,9 @@ async function prosesDuel() {
             throw new Error(data.error || "Gagal memproses duel.");
         }
 
-        // Render hasil ulasan juri ke layout bagian tengah
         if (document.getElementById('battle-winner')) document.getElementById('battle-winner').innerHTML = `<span style='color: #ffc107;'>JUARA:</span> ${data.winner}`;
         if (document.getElementById('battle-reason')) document.getElementById('battle-reason').textContent = data.reason;
 
-        // Gambar ulang Stat Bar kedua belah pihak pasca-tanding mengikuti penilaian juri AI
         const statsContainer1 = document.getElementById('f1-stats');
         if (statsContainer1 && data.f1) {
             statsContainer1.innerHTML = `
@@ -171,7 +187,6 @@ async function prosesDuel() {
             `;
         }
 
-        // Tampilkan container hasil pertempuran secara visual
         if (arenaEl) arenaEl.style.display = 'flex';
 
     } catch (error) {
@@ -182,7 +197,6 @@ async function prosesDuel() {
     }
 }
 
-// Pasang event listener ke tombol duel
 if (btnAction) {
     btnAction.addEventListener("click", prosesDuel);
 }
