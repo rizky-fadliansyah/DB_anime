@@ -147,7 +147,6 @@ if (searchInput) {
 }
 
 // --- 4. DETAIL & ACTION (Gabungan) ---
-// --- 4. DETAIL & ACTION (Gabungan) ---
 function bukaDetailKarakter(char) {
     if (!detailZone) return;
     
