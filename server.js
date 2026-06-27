@@ -137,7 +137,7 @@ app.post('/api/deathbattle', async (req, res) => {
     "f1": { "name": "P1", "tier": "Tier P1", "ability": "A, B", "desc": "Teks", "str": 80, "spd": 80, "dur": 80, "iq": 80, "pwr": 80, "stam": 80 },
     "f2": { "name": "P2", "tier": "Tier P2", "ability": "C, D", "desc": "Teks", "str": 70, "spd": 70, "dur": 70, "iq": 70, "pwr": 70, "stam": 70 },
     "winner": "NAMA PEMENANG",
-    "reason": "Analisis detail..."
+    "reason": "Analisis lah seperti analisis profesional sengan se detail-detailnya maksimal 15 kalimat"
     }`;
 
     const userPrompt = `Simulasikan pertarungan maut:\n\nPETARUNG 1:\nNama: ${p1.name}\nTier: ${p1.tier}\nStat Angka: STR:${p1.str}, SPD:${p1.spd}, DUR:${p1.dur}, IQ:${p1.iq}, PWR:${p1.pwr}, STAM:${p1.stam}\n\nPETARUNG 2:\nNama: ${p2.name}\nTier: ${p2.tier}\nStat Angka: STR:${p2.str}, SPD:${p2.spd}, DUR:${p2.dur}, IQ:${p2.iq}, PWR:${p2.pwr}, STAM:${p2.stam}`;
