@@ -108,7 +108,7 @@ app.post('/api/research', async (req, res) => {
     }
 });
 
-   // --- API 3: PROSES SIMULASI DUEL DEATH BATTLE (ANALISIS PROFESIONAL & OBJEKTIF) ---
+// --- API 3: PROSES SIMULASI DUEL DEATH BATTLE (ANALISIS PROFESIONAL & OBJEKTIF) ---
 app.post('/api/deathbattle', async (req, res) => {
     const { p1, p2 } = req.body;
 
@@ -116,10 +116,12 @@ app.post('/api/deathbattle', async (req, res) => {
     Tugasmu adalah menganalisis bentrokan kekuatan secara objektif, kritis, tidak berat sebelah, dan menggunakan terminologi pertarungan yang tepat.
     Pertimbangkan kecocokan hax, perbedaan Attack Potency (AP), kecepatan (Speed), durabilitas, serta kondisi taktis bagaimana salah satu karakter bisa mengamankan kemenangan.
 
+    Kamu WAJIB melakukan analisis berdasarkan data spesifik (Tier, Ability, dan Desc) yang diberikan oleh user di user prompt. Jangan mengarang kemampuan di luar data yang diberikan.
+
     ATURAN KETAT FORMAT & KEPADATAN TEKS:
     1. Pada bagian "ability", tuliskan MAKSIMAL 3 poin kemampuan/hax paling krusial dipisahkan dengan tanda koma.
     2. Pada bagian "desc", tuliskan ringkasan kondisi fisik dalam 1 kalimat pendek.
-    3. Pada bagian "reason", tuliskan ANALISIS PROFESIONAL mendalam (sekitar 4-6 kalimat padat). Analisis harus berimbang dengan membedah keunggulan masing-masing karakter terlebih dahulu sebelum menyimpulkan faktor krusial penentu kemenangan (seperti efektivitas hax seluler, keunggulan kecepatan untuk speedblitz, atau stamina). Jangan langsung to-the-point tanpa penjelasan logis.
+    3. Pada bagian "reason", tuliskan ANALISIS PROFESIONAL mendalam (sekitar 4-6 kalimat padat). Analisis harus berimbang dengan membedah keunggulan masing-masing karakter terlebih dahulu berdasarkan data yang ada sebelum menyimpulkan faktor krusial penentu kemenangan (seperti efektivitas hax seluler, keunggulan kecepatan untuk speedblitz, atau stamina). Jangan langsung to-the-point tanpa penjelasan logis.
 
     Berikan respons wajib dalam format JSON murni terstruktur berikut:
     {
@@ -141,9 +143,26 @@ app.post('/api/deathbattle', async (req, res) => {
     "reason": "Pertarungan ini menyajikan bentrokan yang sangat berimbang di mana [Nama P1] unggul dalam aspek X dan kapasitas stamina, sementara [Nama P2] mendominasi lewat kemampuan Y yang sulit diprediksi. Namun, faktor penentu kemenangan dalam skenario ini bermuara pada kemampuan [Nama Pemenang] untuk mengeksploitasi celah pertahanan lawan lewat [sebutkan faktor/hax/kecepatan]. Dalam kondisi di mana pertempuran berlangsung intens, [Nama Pemenang] mampu mendaratkan serangan fatal yang mengabaikan daya tahan konvensional lawan, sehingga mengunci kemenangan secara logis."
     }`;
 
-    const userPrompt = `Simulasikan pertarungan maut secara analitis dan profesional antara dua karakter ini:
-    Petarung 1: ${p1.name} (Form: ${p1.form_name}) dari seri ${p1.origin}
-    Petarung 2: ${p2.name} (Form: ${p2.form_name}) dari seri ${p2.origin}`;
+    // PERBAIKAN UTAMA: Menyuapi seluruh data berkas riset agar dianalisis secara profesional oleh AI
+    const userPrompt = `Simulasikan pertarungan maut secara analitis dan profesional berdasarkan data berkas berikut:
+
+    PETARUNG 1:
+    Nama: ${p1.name} (Form: ${p1.form_name})
+    Asal: ${p1.origin}
+    Tier: ${p1.tier || 'Belum diketahui'}
+    Kemampuan/Hax: ${p1.ability || 'Tidak ada data'}
+    Deskripsi: ${p1.desc || 'Tidak ada data'}
+    Stat Angka: STR:${p1.str}, SPD:${p1.spd}, DUR:${p1.dur}, IQ:${p1.iq}, PWR:${p1.pwr}, STAM:${p1.stam}
+
+    --------------------------------------------------
+
+    PETARUNG 2:
+    Nama: ${p2.name} (Form: ${p2.form_name})
+    Asal: ${p2.origin}
+    Tier: ${p2.tier || 'Belum diketahui'}
+    Kemampuan/Hax: ${p2.ability || 'Tidak ada data'}
+    Deskripsi: ${p2.desc || 'Tidak ada data'}
+    Stat Angka: STR:${p2.str}, SPD:${p2.spd}, DUR:${p2.dur}, IQ:${p2.iq}, PWR:${p2.pwr}, STAM:${p2.stam}`;
 
     try {
         const chatCompletion = await groq.chat.completions.create({
